@@ -11,11 +11,14 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Editor visual da marca: nome, slogan, cores, logo e banner publicados em tempo real.
 - Upload de fotos e logo em JPG, PNG ou WebP, salvos em Base64 diretamente no banco.
 - Segurança por Row Level Security (RLS): clientes só acessam os próprios pedidos; somente admins alteram o catálogo.
+- Pagamentos integrados por Stripe, Mercado Pago e PagBank, sem expor tokens no navegador.
+- Rastreamento de entregas com transportadora, código e link visível na conta do cliente.
+- Portal de doações com fotos, solicitação de coleta e acompanhamento pelo cliente e pela loja.
 
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute somente `supabase/migrations/001_store_customization.sql`.
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute `supabase/migrations/001_store_customization.sql` e depois `supabase/migrations/002_payments_tracking_donations.sql`.
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -33,8 +36,9 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 
 1. Envie o repositório ao GitHub.
 2. Importe-o na Vercel.
-3. Cadastre `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` em **Settings → Environment Variables**.
-4. Faça um novo deploy. O comando padrão `npm run build` já está configurado.
+3. Cadastre todas as variáveis de `.env.example` em **Settings → Environment Variables**. Use apenas os provedores de pagamento contratados; seus tokens ficam protegidos no servidor.
+4. No painel da Stripe, cadastre o webhook `https://SEU-SITE/api/payments/webhook?provider=stripe` e copie o segredo para `STRIPE_WEBHOOK_SECRET`. Mercado Pago e PagBank recebem a URL automaticamente.
+5. Faça um novo deploy. O comando padrão `npm run build` já está configurado.
 
 ## Rotas
 
@@ -44,3 +48,4 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 | `/login` | Público | Login e cadastro |
 | `/minha-conta` | Cliente autenticado | Pedidos e conta |
 | `/admin` | Apenas admin | Gestão completa |
+| `/doar` | Cliente autenticado | Doação e coleta de peças |

@@ -81,3 +81,21 @@ create policy "admin personaliza loja" on store_settings for update using(is_adm
 
 -- Depois de criar sua conta, torne-a administradora (troque o e-mail):
 -- update public.profiles set role='admin' where email='seu@email.com';
+
+-- Logística, pagamentos e doações
+alter table public.orders add column payment_provider text;
+alter table public.orders add column payment_reference text;
+alter table public.orders add column tracking_code text;
+alter table public.orders add column carrier text;
+alter table public.orders add column tracking_url text;
+create table public.donations (
+  id uuid primary key default gen_random_uuid(), donor_id uuid not null default auth.uid() references profiles(id),
+  donor_name text not null, phone text not null, quantity integer not null check(quantity > 0),
+  category text not null, condition text not null, pickup_method text not null, address text,
+  notes text, images jsonb not null default '[]'::jsonb, status text not null default 'recebida',
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+);
+alter table public.donations enable row level security;
+create policy "cliente cria doacao" on donations for insert with check(donor_id=auth.uid());
+create policy "cliente acompanha doacao" on donations for select using(donor_id=auth.uid() or is_admin());
+create policy "admin gerencia doacao" on donations for update using(is_admin());
