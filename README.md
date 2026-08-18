@@ -14,11 +14,15 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Pagamentos integrados por Stripe, Mercado Pago e PagBank, sem expor tokens no navegador.
 - Rastreamento de entregas com transportadora, código e link visível na conta do cliente.
 - Portal de doações com fotos, solicitação de coleta e acompanhamento pelo cliente e pela loja.
+- PDV para vendas presenciais com busca, estoque em tempo real, desconto, cliente e Pix/cartão/dinheiro.
+- Perfis separados para cliente, operador de caixa, estoque, gerente e administrador.
+- Relatórios por período, indicadores, categorias mais vendidas e exportação CSV.
+- Catálogo com filtros avançados por categoria, tamanho, faixa de preço e ordenação.
 
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute `supabase/migrations/001_store_customization.sql` e depois `supabase/migrations/002_payments_tracking_donations.sql`.
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute, na ordem, as migrations `001`, `002` e `003` da pasta `supabase/migrations`.
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -49,3 +53,5 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 | `/minha-conta` | Cliente autenticado | Pedidos e conta |
 | `/admin` | Apenas admin | Gestão completa |
 | `/doar` | Cliente autenticado | Doação e coleta de peças |
+| `/pdv` | Admin, gerente ou caixa | Venda presencial |
+| `/relatorios` | Admin ou gerente | Indicadores e exportação |
