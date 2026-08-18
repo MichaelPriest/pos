@@ -26,6 +26,15 @@ create table public.order_items (
   product_id uuid references products(id), quantity integer not null check(quantity > 0),
   unit_price numeric(10,2) not null check(unit_price >= 0)
 );
+create table public.store_settings (
+  id smallint primary key default 1 check(id = 1), store_name text not null default 'ReVeste',
+  tagline text not null default 'Estilo que renasce com você.', logo_url text,
+  primary_color text not null default '#315d4a', accent_color text not null default '#b36f53',
+  hero_title text not null default 'Estilo que renasce com você.',
+  hero_subtitle text not null default 'Peças únicas, escolhidas com carinho para durar muitas histórias — inclusive a sua.',
+  hero_image text, whatsapp text, instagram text, updated_at timestamptz not null default now()
+);
+insert into public.store_settings(id) values(1);
 
 create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path=public as $$
 begin insert into profiles(id,name,email) values(new.id,coalesce(new.raw_user_meta_data->>'name',''),new.email); return new; end; $$;
@@ -57,6 +66,7 @@ end; $$;
 
 alter table profiles enable row level security; alter table products enable row level security;
 alter table orders enable row level security; alter table order_items enable row level security;
+alter table store_settings enable row level security;
 create policy "perfil proprio" on profiles for select using(id=auth.uid() or is_admin());
 create policy "admin gerencia perfis" on profiles for update using(is_admin());
 create policy "catalogo publico" on products for select using(active=true or is_admin());
@@ -64,7 +74,10 @@ create policy "admin cadastra produtos" on products for insert with check(is_adm
 create policy "admin atualiza produtos" on products for update using(is_admin());
 create policy "admin exclui produtos" on products for delete using(is_admin());
 create policy "cliente ve pedidos" on orders for select using(customer_id=auth.uid() or is_admin());
+create policy "admin atualiza pedidos" on orders for update using(is_admin());
 create policy "cliente ve itens" on order_items for select using(exists(select 1 from orders where orders.id=order_id and (customer_id=auth.uid() or is_admin())));
+create policy "configuracao publica" on store_settings for select using(true);
+create policy "admin personaliza loja" on store_settings for update using(is_admin());
 
 -- Depois de criar sua conta, torne-a administradora (troque o e-mail):
 -- update public.profiles set role='admin' where email='seu@email.com';
