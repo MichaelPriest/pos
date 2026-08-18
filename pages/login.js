@@ -14,7 +14,11 @@ export default function Login() {
     try {
       const result = register ? await auth.signUp(form.name, form.email, form.password) : await auth.signIn(form.email, form.password);
       if (register && !result.access_token) setStatus({ loading: false, error: 'Cadastro realizado! Confirme seu e-mail para entrar.' });
-      else router.push(router.query.next || '/loja');
+      else {
+        const profile = await auth.profile();
+        const destination = profile?.role === 'customer' ? '/loja' : profile?.role === 'cashier' ? '/caixa' : '/admin';
+        router.push(router.query.next || destination);
+      }
     } catch (error) { setStatus({ loading: false, error: error.message }); }
   };
   return <><Head><title>{register ? 'Criar conta' : 'Entrar'} | ReVeste</title></Head><main className="auth-page">
