@@ -1,0 +1,7 @@
+import Head from 'next/head';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import AuthGuard from '../components/AuthGuard';
+import { auth, db } from '../lib/supabase';
+const money=n=>Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+export default function Account(){const[profile,setProfile]=useState(null),[orders,setOrders]=useState([]);useEffect(()=>{auth.profile().then(setProfile);db.orders().then(setOrders).catch(()=>{})},[]);return <AuthGuard><Head><title>Minha conta | ReVeste</title></Head><main className="account-page"><header><Link href="/loja" className="brand"><span className="brand-mark">R</span><span>Re<span>Veste</span></span></Link><Link href="/loja">← Voltar à loja</Link></header><section><p className="eyebrow">MINHA CONTA</p><h1>Olá, {profile?.name||'cliente'}!</h1><p>Acompanhe seus pedidos e dados da sua conta.</p><div className="account-grid"><article><h2>Meus pedidos</h2>{orders.length?orders.map(o=><div className="account-order" key={o.id}><span><strong>Pedido #{o.id.slice(0,8)}</strong><small>{new Date(o.created_at).toLocaleDateString('pt-BR')}</small></span><b>{money(o.total)}</b><em>{o.status}</em></div>):<div className="empty-state">Você ainda não fez nenhum pedido.</div>}</article><aside><h2>Meus dados</h2><strong>{profile?.name}</strong><p>{profile?.email}</p><button onClick={()=>{auth.signOut();location.href='/loja'}}>Sair da conta</button></aside></div></section></main></AuthGuard>}

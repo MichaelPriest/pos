@@ -1,0 +1,34 @@
+import Head from 'next/head';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { auth, configured, db, getSession } from '../lib/supabase';
+
+const demo = [
+  {id:'d1',name:'Vestido Floral Vintage',category:'Vestidos',size:'M',price:89.9,stock:1,image_url:'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=700'},
+  {id:'d2',name:'Jaqueta Jeans Oversized',category:'Casacos',size:'G',price:129.9,stock:2,image_url:'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=700'},
+  {id:'d3',name:'Bolsa Couro Caramelo',category:'Acessórios',size:'Único',price:74.9,stock:1,image_url:'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=700'},
+  {id:'d4',name:'Camisa Linho Natural',category:'Camisas',size:'P',price:65.9,stock:3,image_url:'https://images.unsplash.com/photo-1605763240000-7e93b172d754?w=700'},
+  {id:'d5',name:'Calça Alfaiataria Bege',category:'Calças',size:'38',price:98.9,stock:1,image_url:'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=700'},
+  {id:'d6',name:'Tênis Retrô Branco',category:'Calçados',size:'37',price:119.9,stock:1,image_url:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=700'}
+];
+const money = n => Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+
+export default function Store() {
+  const [products,setProducts]=useState(demo),[cart,setCart]=useState([]),[query,setQuery]=useState(''),[category,setCategory]=useState('Todos'),[open,setOpen]=useState(false),[loading,setLoading]=useState(configured),[message,setMessage]=useState(''),[session,setSession]=useState(null);
+  useEffect(()=>{setSession(getSession());if(configured) db.products().then(setProducts).catch(e=>setMessage(e.message)).finally(()=>setLoading(false))},[]);
+  const filtered=useMemo(()=>products.filter(p=>(category==='Todos'||p.category===category)&&p.name.toLowerCase().includes(query.toLowerCase())),[products,category,query]);
+  const total=cart.reduce((sum,p)=>sum+Number(p.price),0);
+  const checkout=async()=>{if(!session){location.href='/login?next=/loja';return} try{await db.checkout({items:cart.map(p=>({product_id:p.id,quantity:1})),payment_method:'pix'});setCart([]);setOpen(false);setMessage('Pedido criado! Você verá as instruções de pagamento no seu e-mail.')}catch(e){setMessage(e.message)}};
+  return <><Head><title>ReVeste | Brechó online</title><meta name="description" content="Moda circular, peças únicas e consumo consciente."/></Head><div className="store-page">
+    <header className="store-header"><Link href="/loja" className="brand"><span className="brand-mark">R</span><span>Re<span>Veste</span></span></Link><nav><a href="#novidades">Novidades</a><a href="#catalogo">Comprar</a><a href="#sobre">Nossa história</a></nav><div className="store-tools"><button onClick={()=>document.querySelector('.store-search input').focus()}>⌕</button><Link href={session?'/minha-conta':'/login'}>♙</Link><button onClick={()=>setOpen(true)}>Sacola <b>{cart.length}</b></button></div></header>
+    <section className="hero" id="novidades"><div><span>CURADORIA DE AGOSTO</span><h1>Estilo que<br/><em>renasce</em> com você.</h1><p>Peças únicas, escolhidas com carinho para durar muitas histórias — inclusive a sua.</p><a href="#catalogo" className="shop-primary">Descobrir peças →</a><small>♻ Moda circular &nbsp; · &nbsp; ✓ Curadoria cuidadosa</small></div></section>
+    <section className="store-benefits"><span>✦ Peças únicas</span><span>♻ Consumo consciente</span><span>⌁ Envio para todo Brasil</span><span>♡ Compra segura</span></section>
+    <section className="catalog" id="catalogo"><div className="catalog-head"><div><span className="section-kicker">ESCOLHIDAS PARA VOCÊ</span><h2>Novidades no closet</h2></div><div className="store-search"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar uma peça..."/><span>⌕</span></div></div>
+      <div className="category-pills">{['Todos',...new Set(products.map(p=>p.category))].map(c=><button className={c===category?'active':''} onClick={()=>setCategory(c)} key={c}>{c}</button>)}</div>
+      {message&&<div className="store-message">{message}</div>}{loading?<div className="empty-state">Carregando peças...</div>:<div className="shop-grid">{filtered.map(p=><article className="shop-card" key={p.id}><div className="shop-image"><img src={p.image_url||'/placeholder.svg'} alt={p.name}/><span>PEÇA ÚNICA</span><button onClick={()=>setCart([...cart,p])}>+</button></div><p>{p.category}</p><h3>{p.name}</h3><div><span>Tam. {p.size}</span><strong>{money(p.price)}</strong></div></article>)}</div>}
+    </section>
+    <section className="story" id="sobre"><div><span className="section-kicker">NOSSO PROPÓSITO</span><h2>Roupa boa não<br/>nasce para ser descartada.</h2><p>Acreditamos em uma moda mais gentil com o planeta. Cada peça é higienizada, avaliada e preparada para viver uma nova história.</p><Link href="/login">Faça parte desse movimento →</Link></div></section>
+    <footer className="store-footer"><div className="brand"><span className="brand-mark">R</span><span>Re<span>Veste</span></span></div><p>Moda circular para histórias que continuam.</p><small>© 2026 ReVeste. Feito com propósito.</small><Link href="/admin">Área administrativa</Link></footer>
+    {open&&<div className="cart-overlay" onClick={()=>setOpen(false)}><aside onClick={e=>e.stopPropagation()}><div className="cart-title"><h2>Sua sacola <small>{cart.length} itens</small></h2><button onClick={()=>setOpen(false)}>×</button></div>{cart.length===0?<div className="empty-cart">Sua sacola está vazia.<button onClick={()=>setOpen(false)}>Continuar comprando</button></div>:<><div className="cart-items">{cart.map((p,i)=><div key={`${p.id}-${i}`}><img src={p.image_url} alt=""/><span><strong>{p.name}</strong><small>Tam. {p.size}</small><b>{money(p.price)}</b></span><button onClick={()=>setCart(cart.filter((_,x)=>x!==i))}>×</button></div>)}</div><div className="cart-total"><span>Total</span><strong>{money(total)}</strong></div><button className="shop-primary" onClick={checkout}>Finalizar pedido</button><small>Pagamento seguro · Pix</small></>}</aside></div>}
+  </div></>;
+}
