@@ -18,11 +18,14 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Perfis separados para cliente, operador de caixa, estoque, gerente e administrador.
 - Relatórios por período, indicadores, categorias mais vendidas e exportação CSV.
 - Catálogo com filtros avançados por categoria, tamanho, faixa de preço e ordenação.
+- Controle completo de caixa por operador: abertura, suprimento, sangria, vendas em dinheiro, conferência, diferença e fechamento.
+- Configuração dos processadores e meios de pagamento sem expor a marca do gateway ao cliente.
+- Linha do tempo de rastreamento e tabelas administrativas com pesquisa e paginação.
 
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute, na ordem, as migrations `001`, `002` e `003` da pasta `supabase/migrations`.
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute, na ordem, as migrations `001`, `002`, `003` e `004` da pasta `supabase/migrations`.
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -55,3 +58,5 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 | `/doar` | Cliente autenticado | Doação e coleta de peças |
 | `/pdv` | Admin, gerente ou caixa | Venda presencial |
 | `/relatorios` | Admin ou gerente | Indicadores e exportação |
+| `/caixa` | Admin, gerente ou caixa | Abertura, movimentação e fechamento |
+| `/configuracoes` | Admin ou gerente | Configurações e identidade da loja |

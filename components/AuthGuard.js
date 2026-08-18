@@ -9,7 +9,7 @@ export default function AuthGuard({ admin = false, roles, children }) {
   useEffect(() => {
     if (!getSession()) { router.replace(`/login?next=${encodeURIComponent(router.asPath)}`); return; }
     auth.profile().then((profile) => {
-      const allowed = roles || (admin ? ['admin'] : null);
+      const allowed = roles || (admin ? ['admin', 'manager'] : null);
       if (allowed && !allowed.includes(profile?.role)) router.replace('/loja');
       else setReady(true);
     }).catch(() => { auth.signOut(); router.replace('/login'); });
