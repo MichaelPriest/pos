@@ -1,4 +1,4 @@
-import '../public/styles.css';
+import '../styles/reveste.css';
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />;
