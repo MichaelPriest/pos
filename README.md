@@ -20,12 +20,16 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Catálogo com filtros avançados por categoria, tamanho, faixa de preço e ordenação.
 - Controle completo de caixa por operador: abertura, suprimento, sangria, vendas em dinheiro, conferência, diferença e fechamento.
 - Configuração dos processadores e meios de pagamento sem expor a marca do gateway ao cliente.
-- Linha do tempo de rastreamento e tabelas administrativas com pesquisa e paginação.
+- Linha do tempo de rastreamento, opções logísticas, etiquetas de embalagem e tabelas com pesquisa e paginação.
+- Menu de perfil com foto e atalhos conforme o nível de acesso.
+- Recibos não fiscais e espelho de cupom fiscal para impressão no PDV.
+- Cofre criptografado de chaves de pagamento acessível somente pelo administrador.
+- Modo manutenção que bloqueia o catálogo e todas as vendas online.
 
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute, na ordem, as migrations `001`, `002`, `003` e `004` da pasta `supabase/migrations`.
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou a versão anterior, execute, na ordem, as migrations `001`, `002`, `003`, `004` e `005` da pasta `supabase/migrations`.
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
