@@ -96,6 +96,7 @@ O cadastro de funcionários possui compensação automática: se o perfil ou os 
 | `/minha-conta` | Somente cliente | Pedidos, endereços, doações e dados |
 | `/checkout` | Somente cliente | Entrega, frete e pagamento |
 | `/perfil` | Somente equipe | Perfil profissional isolado |
+| `/equipe/:id` | Somente administrador | Cargo, permissão, salário e bloqueio do funcionário |
 | `/admin` | Apenas admin | Gestão completa |
 | `/doar` | Cliente autenticado | Doação e coleta de peças |
 | `/pdv` | Admin, gerente ou caixa | Venda presencial |
