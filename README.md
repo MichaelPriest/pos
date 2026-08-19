@@ -24,6 +24,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Editor visual da marca: nome, slogan, cores, logo e banner publicados em tempo real.
 - Upload de fotos e logo em JPG, PNG ou WebP, salvos em Base64 diretamente no banco.
 - Segurança por Row Level Security (RLS): clientes só acessam os próprios pedidos; somente admins alteram o catálogo.
+- Sessões com renovação automática, webhooks idempotentes e trilha de auditoria administrativa para operações críticas.
 - Pagamentos integrados por Stripe, Mercado Pago e PagBank, sem expor tokens no navegador.
 - Rastreamento de entregas com transportadora, código e link visível na conta do cliente.
 - Portal de doações com fotos, solicitação de coleta e acompanhamento pelo cliente e pela loja.
@@ -90,6 +91,7 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 | `/equipe` | Apenas admin | Funcionários e acessos |
 | `/rh` | Admin ou gerente | Quadro e indicadores de RH |
 | `/ponto` | Equipe | Ponto eletrônico |
+| `/auditoria` | Apenas admin | Histórico de alterações críticas |
 
 - Checkout com máscaras brasileiras e endereço automático via BrasilAPI.
 - Canais configuráveis: Mercado Livre, Shopee, Meta, WhatsApp, X e TikTok.
