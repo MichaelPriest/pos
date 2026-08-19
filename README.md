@@ -137,3 +137,7 @@ A página financeira inclui contas a pagar e receber, pesquisa e filtros combin�
 ### Integração entre caixa e financeiro
 
 O financeiro consolida o saldo esperado dos caixas abertos, vendas em dinheiro, suprimentos, sangrias e diferenças dos fechamentos, sem contabilizar novamente vendas que já constam nos pedidos pagos.
+
+### PDV e situação do caixa
+
+O PDV mostra o saldo esperado e o estado do caixa no cabeçalho. Quando fechado, a tela permanece visível, mas um modal bloqueia novas vendas e oferece acesso direto à abertura do caixa. Na sidebar, somente a visão geral ou o grupo da rota atual inicia expandido.
