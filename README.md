@@ -133,3 +133,7 @@ A área restrita possui grupos recolhíveis por domínio. A página de RH oferec
 ### Gestão financeira
 
 A página financeira inclui contas a pagar e receber, pesquisa e filtros combináveis, identificação de vencimentos, baixa de lançamentos e exportação CSV do resultado filtrado.
+
+### Integração entre caixa e financeiro
+
+O financeiro consolida o saldo esperado dos caixas abertos, vendas em dinheiro, suprimentos, sangrias e diferenças dos fechamentos, sem contabilizar novamente vendas que já constam nos pedidos pagos.
