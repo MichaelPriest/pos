@@ -25,5 +25,7 @@ test('monta checkout Stripe em português com marca, e-mail e vínculo ao pedido
   assert.equal(body.get('payment_intent_data[metadata][order_id]'), id);
   assert.equal(body.get('line_items[0][price_data][product_data][name]'), 'Brechó das Amigas · Pedido #7EFB8F88');
   assert.equal(body.get('line_items[0][price_data][unit_amount]'), '4990');
+  assert.ok(Number(body.get('expires_at')) > Math.floor(Date.now()/1000));
+  assert.match(body.get('success_url'), new RegExp(`pedido=${id}.*session_id=\\{CHECKOUT_SESSION_ID\\}`));
   assert.match(body.get('cancel_url'), /\/checkout\?pagamento=cancelado$/);
 });

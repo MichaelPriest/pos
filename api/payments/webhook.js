@@ -35,10 +35,10 @@ async function updateOrder(orderId, status, reference) {
   const base = process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!orderId || !base || !key) throw new Error('Pedido ou Supabase não configurado');
-  const response = await fetch(`${base}/rest/v1/orders?id=eq.${encodeURIComponent(orderId)}`, {
-    method: 'PATCH',
-    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-    body: JSON.stringify({ status: mapStatus(status), payment_reference: String(reference || '') }),
+  const response = await fetch(`${base}/rest/v1/rpc/reconcile_order_payment`, {
+    method: 'POST',
+    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_order_id: orderId, p_status: mapStatus(status), p_reference: String(reference || '') }),
   });
   if (!response.ok) throw new Error('Não foi possível conciliar o pedido');
 }
