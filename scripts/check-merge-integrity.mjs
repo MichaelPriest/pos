@@ -13,7 +13,13 @@ for (const file of tracked) {
   });
 }
 
-const legacyNextFiles = ['next.config.mjs','pages/_app.js','pages/_document.js','pages/index.js','public/styles.css'];
+const legacyNextFiles = [
+  'next.config.mjs','jsconfig.json','package-lock.json',
+  'pages/_app.js','pages/_document.js','pages/index.js','pages/configuracoes.js',
+  'pages/api/hello.js','pages/api/admin/payment-settings.js',
+  'pages/api/payments/create.js','pages/api/payments/webhook.js',
+  'public/styles.css','styles/Home.module.css','styles/globals.css',
+];
 const restoredLegacy = legacyNextFiles.filter(existsSync);
 const trackedSet = new Set(tracked);
 const shadowedModules = tracked
