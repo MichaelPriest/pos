@@ -7,6 +7,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - **Vite** para desenvolvimento e build de produção.
 - **React Router** para rotas públicas, rotas de clientes, rotas operacionais e parâmetros dinâmicos.
 - Shell responsivo compartilhado nas telas internas, com sidebar fixa no desktop, compacta no tablet e navegação inferior no celular.
+- Carregamento sob demanda por rota (`React.lazy`), fallback visual e Error Boundary para falhas isoladas de interface.
 - Funções serverless em `api/` para credenciais, pagamentos e webhooks; nenhum segredo é incluído no bundle do Vite.
 
 ## Funcionalidades
