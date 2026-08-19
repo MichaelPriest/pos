@@ -1,4 +1,5 @@
 import Head from '../src/shims/Head';
+import StoreBrand from '../components/StoreBrand';
 import Link from '../src/shims/Link';
 import { useRouter } from '../src/shims/router';
 import { useState } from 'react';
@@ -22,7 +23,7 @@ export default function Login() {
     } catch (error) { setStatus({ loading: false, error: error.message }); }
   };
   return <><Head><title>{register ? 'Criar conta' : 'Entrar'} | ReVeste</title></Head><main className="auth-page">
-    <section className="auth-art"><Link href="/loja" className="brand auth-brand"><span className="brand-mark">R</span><span>Re<span>Veste</span></span></Link><div><span className="auth-kicker">MODA CIRCULAR</span><h1>Peças com história.<br/>Um novo jeito de vestir.</h1><p>Compre de forma consciente e dê uma nova vida a peças únicas selecionadas à mão.</p></div><small>© 2026 ReVeste · Consumo consciente, estilo autêntico.</small></section>
+    <section className="auth-art"><Link href="/loja" className="auth-brand"><StoreBrand/></Link><div><span className="auth-kicker">MODA CIRCULAR</span><h1>Peças com história.<br/>Um novo jeito de vestir.</h1><p>Compre de forma consciente e dê uma nova vida a peças únicas selecionadas à mão.</p></div><small>© 2026 ReVeste · Consumo consciente, estilo autêntico.</small></section>
     <section className="auth-form-wrap"><form className="auth-form" onSubmit={submit}><span className="auth-mobile-logo">ReVeste</span><p className="eyebrow">SUA CONTA</p><h2>{register ? 'Crie sua conta' : 'Que bom ter você de volta'}</h2><p>{register ? 'Cadastre-se para acompanhar seus pedidos.' : 'Entre para continuar suas compras.'}</p>
       {register && <label>Nome completo<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Como podemos te chamar?" /></label>}
       <label>E-mail<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="voce@email.com" /></label>

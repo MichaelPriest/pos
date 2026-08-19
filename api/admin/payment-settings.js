@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-const providers=['stripe','mercadopago','pagbank'];
+const providers=['stripe','mercadopago','pagbank','mercadolivre','shopee','meta'];
 const key=()=>crypto.createHash('sha256').update(process.env.APP_ENCRYPTION_KEY||'').digest();
 const encrypt=value=>{if(!process.env.APP_ENCRYPTION_KEY)throw new Error('APP_ENCRYPTION_KEY não configurada');const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',key(),iv),encrypted=Buffer.concat([cipher.update(value,'utf8'),cipher.final()]);return `${iv.toString('hex')}.${cipher.getAuthTag().toString('hex')}.${encrypted.toString('hex')}`};
 const decrypt=value=>{const[iv,tag,data]=value.split('.'),decipher=crypto.createDecipheriv('aes-256-gcm',key(),Buffer.from(iv,'hex'));decipher.setAuthTag(Buffer.from(tag,'hex'));return Buffer.concat([decipher.update(Buffer.from(data,'hex')),decipher.final()]).toString()};

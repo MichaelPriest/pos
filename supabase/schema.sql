@@ -197,3 +197,10 @@ create policy "cupons publicos ativos" on public.coupons for select using(active
 create policy "admin cria cupons" on public.coupons for insert with check(is_admin());
 create policy "admin atualiza cupons" on public.coupons for update using(is_admin());
 create policy "admin exclui cupons" on public.coupons for delete using(is_admin());
+-- Canais públicos configuráveis da marca e marketplaces externos.
+alter table public.store_settings
+  add column if not exists facebook text,
+  add column if not exists x_url text,
+  add column if not exists tiktok text,
+  add column if not exists marketplace_mercadolivre text,
+  add column if not exists marketplace_shopee text;

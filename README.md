@@ -79,3 +79,6 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 | `/relatorios` | Admin ou gerente | Indicadores e exportação |
 | `/caixa` | Admin, gerente ou caixa | Abertura, movimentação e fechamento |
 | `/configuracoes` | Admin ou gerente | Configurações e identidade da loja |
+
+- Checkout com máscaras brasileiras e endereço automático via BrasilAPI.
+- Canais configuráveis: Mercado Livre, Shopee, Meta, WhatsApp, X e TikTok.
