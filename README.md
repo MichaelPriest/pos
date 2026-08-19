@@ -48,7 +48,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `018`).
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `019`).
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -84,6 +84,7 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
 | `/loja` | Público | Catálogo e carrinho |
 | `/produto/:id` | Público | Detalhes, disponibilidade e inclusão persistente na sacola |
 | `/favoritos` | Somente cliente | Lista de desejos persistente e sincronizada com a conta |
+| `/notificacoes` | Somente cliente | Atualizações de pagamento, pedido e rastreamento |
 | `/login` | Público | Login e cadastro |
 | `/minha-conta` | Somente cliente | Pedidos, endereços, doações e dados |
 | `/checkout` | Somente cliente | Entrega, frete e pagamento |
