@@ -16,10 +16,11 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Cadastro e login de clientes com histórico de pedidos.
 - Endereços reutilizáveis e idempotentes: compras repetidas atualizam o mesmo endereço, permitem escolher o principal e não criam duplicatas.
 - Checkout transacional: o preço é calculado no banco e o estoque é baixado com trava contra vendas duplicadas.
+- Cupons integrados ao checkout com validação de validade, limite de usos, pedido mínimo e cálculo transacional no banco.
 - Conciliação de pagamento por webhook e consulta direta à operadora: pedidos pendentes não entram no faturamento; cancelamentos devolvem o estoque de forma idempotente.
 - Retomada segura de pagamentos pendentes pela conta do cliente, reutilizando a cobrança ainda aberta sem criar pedidos duplicados.
 - Painel admin protegido por perfil, com métricas, gráficos, produtos, pedidos e clientes.
-- Backoffice corporativo com financeiro, contas a pagar/receber, cadastro separado de funcionários, RH e ponto eletrônico.
+- Backoffice corporativo com financeiro, contas a pagar/receber, cadastro separado de funcionários, RH e ponto eletrônico com quatro marcações diárias.
 - Editor visual da marca: nome, slogan, cores, logo e banner publicados em tempo real.
 - Upload de fotos e logo em JPG, PNG ou WebP, salvos em Base64 diretamente no banco.
 - Segurança por Row Level Security (RLS): clientes só acessam os próprios pedidos; somente admins alteram o catálogo.
