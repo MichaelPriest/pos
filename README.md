@@ -125,3 +125,7 @@ A migração `024_audit_composite_keys.sql` permite auditar registros com chaves
 ### Checkout e navegação administrativa
 
 A migração `025_checkout_key_type.sql` corrige a comparação de `checkout_key` textual com UUID. A barra lateral administrativa organiza os módulos em grupos recolhíveis.
+
+### Navegação global e RH
+
+A área restrita possui grupos recolhíveis por domínio. A página de RH oferece pesquisa, filtros por departamento e situação, acesso ao cadastro funcional e exportação CSV do quadro exibido.
