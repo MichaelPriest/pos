@@ -48,7 +48,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `019`).
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `020`).
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -77,6 +77,8 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
 5. Faça um novo deploy. O comando padrão `npm run build` já está configurado.
 6. Configure `CRON_SECRET` na Vercel. A tarefa diária `/api/orders/expire` cancela reservas não pagas que já ultrapassaram 24 horas, devolvendo estoque e uso de cupom de forma transacional. Em planos que aceitem maior frequência, o agendamento pode ser alterado sem modificar a regra de expiração no banco.
 7. Após o deploy, consulte `/api/health` para validar banco, autenticação e presença das integrações sem expor qualquer segredo. O GitHub Actions também executa testes e build a cada push e pull request.
+
+As rotas sensíveis de pagamento, conciliação, cadastro de funcionários e cofre possuem limite distribuído de requisições. A migration `020_api_rate_limits.sql` mantém os contadores no Supabase, funcionando mesmo quando a Vercel alterna entre diferentes instâncias serverless, e armazena apenas hashes dos endereços de origem.
 
 ## Rotas
 

@@ -1,4 +1,5 @@
 import { decrypt } from '../admin/payment-settings.js';
+import { enforceRateLimit } from '../../lib/server/rate-limit.js';
 
 const paidStatuses = new Set(['paid', 'approved', 'PAID']);
 const failedStatuses = new Set(['unpaid', 'canceled', 'cancelled', 'rejected', 'DECLINED', 'expired']);
@@ -42,6 +43,7 @@ export default async function handler(req, res) {
     const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!base || !anon || !service) return res.status(503).json({ message: 'Supabase não configurado.' });
+    await enforceRateLimit(req,res,{base,service,scope:'payment-status',limit:30,windowSeconds:60});
     const userResponse = await fetch(`${base}/auth/v1/user`, { headers: { apikey: anon, Authorization: `Bearer ${token}` } });
     if (!userResponse.ok) return res.status(401).json({ message: 'Sessão expirada.' });
     const user = await userResponse.json(), orderId = String(req.body?.order_id || '');
@@ -56,5 +58,5 @@ export default async function handler(req, res) {
     const status = orderStatusForPayment(payment.status);
     if (status !== 'pendente') await fetch(`${base}/rest/v1/rpc/reconcile_order_payment`, { method: 'POST', headers: { apikey: service, Authorization: `Bearer ${service}`, 'Content-Type':'application/json' }, body:JSON.stringify({ p_order_id:order.id, p_status:status, p_reference:String(payment.reference||'') }) });
     return res.json({ verified: true, status, paid: status === 'pago' });
-  } catch (error) { return res.status(400).json({ message: error.message }); }
+  } catch (error) { return res.status(error.statusCode || 400).json({ message: error.message }); }
 }

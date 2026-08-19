@@ -1,4 +1,5 @@
 import { decrypt } from '../admin/payment-settings.js';
+import { enforceRateLimit } from '../../lib/server/rate-limit.js';
 const providers = {
   async stripe(order, origin, email, secret, store) {
     const body = buildStripeCheckoutBody(order, origin, email, store);
@@ -22,6 +23,7 @@ export default async function handler(req,res){
     const order_id=normalizeOrderId(req.body?.order_id);
     const provider=req.body?.provider; const supabase=(process.env.VITE_SUPABASE_URL||process.env.NEXT_PUBLIC_SUPABASE_URL); const anon=(process.env.VITE_SUPABASE_ANON_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY); const service=process.env.SUPABASE_SERVICE_ROLE_KEY; const token=req.headers.authorization?.replace('Bearer ','');
     if(!supabase||!anon||!service)return res.status(503).json({message:'Integração com o Supabase incompleta na Vercel.'});
+    await enforceRateLimit(req,res,{base:supabase,service,scope:'payment-create',limit:10,windowSeconds:60});
     if(!token||!providers[provider]||!order_id)return res.status(400).json({message:'Pagamento inválido.'});
     const userResponse=await fetch(`${supabase}/auth/v1/user`,{headers:{apikey:anon,Authorization:`Bearer ${token}`}});if(!userResponse.ok)return res.status(401).json({message:'Sessão expirada.'});const user=await userResponse.json();
     const orderResponse=await fetch(`${supabase}/rest/v1/orders?id=eq.${encodeURIComponent(order_id)}&customer_id=eq.${encodeURIComponent(user.id)}&select=*`,{headers:{apikey:service,Authorization:`Bearer ${service}`}});const orders=await orderResponse.json();
@@ -33,5 +35,5 @@ export default async function handler(req,res){
     const payment=await providers[provider](orders[0],origin,user.email,secret,storeRows[0]||{});
     await fetch(`${supabase}/rest/v1/orders?id=eq.${order_id}`,{method:'PATCH',headers:{apikey:service,Authorization:`Bearer ${service}`,'Content-Type':'application/json'},body:JSON.stringify({payment_provider:provider,payment_reference:payment.reference})});
     return res.status(200).json(payment);
-  }catch(error){return res.status(500).json({message:error.message});}
+  }catch(error){return res.status(error.statusCode||500).json({message:error.message});}
 }
