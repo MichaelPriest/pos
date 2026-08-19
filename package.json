@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "node --test",
+    "check:merge": "node scripts/check-merge-integrity.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",

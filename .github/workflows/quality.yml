@@ -21,6 +21,8 @@ jobs:
           cache-dependency-path: package.json
       - name: Instalar dependências
         run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Verificar integridade do merge
+        run: npm run check:merge
       - name: Testes automatizados
         run: npm test
       - name: Build de produção
