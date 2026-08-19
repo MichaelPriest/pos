@@ -14,6 +14,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 
 - Loja pública responsiva com busca, categorias, catálogo e carrinho.
 - Cadastro e login de clientes com histórico de pedidos.
+- Endereços reutilizáveis e idempotentes: compras repetidas atualizam o mesmo endereço, permitem escolher o principal e não criam duplicatas.
 - Checkout transacional: o preço é calculado no banco e o estoque é baixado com trava contra vendas duplicadas.
 - Conciliação de pagamento por webhook e consulta direta à operadora: pedidos pendentes não entram no faturamento; cancelamentos devolvem o estoque de forma idempotente.
 - Retomada segura de pagamentos pendentes pela conta do cliente, reutilizando a cobrança ainda aberta sem criar pedidos duplicados.
