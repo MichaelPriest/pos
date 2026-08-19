@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildStripeCheckoutBody, normalizeOrderId } from '../api/payments/create.js';
+import { buildStripeCheckoutBody, normalizeOrderId, resumeExisting } from '../api/payments/create.js';
 
 const id = '7efb8f88-f39d-4729-9378-9a562f72e70e';
 
@@ -28,4 +28,18 @@ test('monta checkout Stripe em português com marca, e-mail e vínculo ao pedido
   assert.ok(Number(body.get('expires_at')) > Math.floor(Date.now()/1000));
   assert.match(body.get('success_url'), new RegExp(`pedido=${id}.*session_id=\\{CHECKOUT_SESSION_ID\\}`));
   assert.match(body.get('cancel_url'), /\/checkout\?pagamento=cancelado$/);
+});
+
+test('retoma a mesma sessão Stripe enquanto a cobrança permanece aberta', async t => {
+  const originalFetch = global.fetch;
+  t.after(() => { global.fetch = originalFetch; });
+  global.fetch = async () => ({ ok:true, json:async()=>({ id:'cs_open', status:'open', url:'https://checkout.stripe.test/cs_open' }) });
+  assert.deepEqual(await resumeExisting({ payment_reference:'cs_open' }, 'stripe', 'sk_test'), { url:'https://checkout.stripe.test/cs_open', reference:'cs_open', resumed:true });
+});
+
+test('não reutiliza cobrança Stripe expirada', async t => {
+  const originalFetch = global.fetch;
+  t.after(() => { global.fetch = originalFetch; });
+  global.fetch = async () => ({ ok:true, json:async()=>({ id:'cs_expired', status:'expired' }) });
+  assert.equal(await resumeExisting({ payment_reference:'cs_expired' }, 'stripe', 'sk_test'), null);
 });

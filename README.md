@@ -16,6 +16,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Cadastro e login de clientes com histórico de pedidos.
 - Checkout transacional: o preço é calculado no banco e o estoque é baixado com trava contra vendas duplicadas.
 - Conciliação de pagamento por webhook e consulta direta à operadora: pedidos pendentes não entram no faturamento; cancelamentos devolvem o estoque de forma idempotente.
+- Retomada segura de pagamentos pendentes pela conta do cliente, reutilizando a cobrança ainda aberta sem criar pedidos duplicados.
 - Painel admin protegido por perfil, com métricas, gráficos, produtos, pedidos e clientes.
 - Editor visual da marca: nome, slogan, cores, logo e banner publicados em tempo real.
 - Upload de fotos e logo em JPG, PNG ou WebP, salvos em Base64 diretamente no banco.
