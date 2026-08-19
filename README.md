@@ -81,6 +81,7 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
 | Rota | Acesso | Uso |
 | --- | --- | --- |
 | `/loja` | Público | Catálogo e carrinho |
+| `/produto/:id` | Público | Detalhes, disponibilidade e inclusão persistente na sacola |
 | `/login` | Público | Login e cadastro |
 | `/minha-conta` | Somente cliente | Pedidos, endereços, doações e dados |
 | `/checkout` | Somente cliente | Entrega, frete e pagamento |

@@ -8,6 +8,7 @@ import AppErrorBoundary from './components/AppErrorBoundary';
 import SystemLayout from './components/SystemLayout';
 
 const Store = lazy(() => import('../pages/loja'));
+const Product = lazy(() => import('../pages/produto'));
 const Login = lazy(() => import('../pages/login'));
 const Account = lazy(() => import('../pages/minha-conta'));
 const Checkout = lazy(() => import('../pages/checkout'));
@@ -29,6 +30,6 @@ const Audit = lazy(() => import('../pages/auditoria'));
 
 function LoadingScreen(){return <div className="route-loading"><span className="brand-mark">R</span><i/><p>Carregando...</p></div>}
 
-function App(){return <AppErrorBoundary><BrowserRouter><Suspense fallback={<LoadingScreen/>}><Routes><Route path="/" element={<Navigate to="/loja" replace/>}/><Route path="/loja" element={<Store/>}/><Route path="/login" element={<Login/>}/><Route path="/minha-conta" element={<Account/>}/><Route path="/checkout" element={<Checkout/>}/><Route path="/doar" element={<Donate/>}/><Route path="/comprovante/:id" element={<Receipt/>}/><Route path="/etiqueta/:id" element={<Label/>}/><Route path="/403" element={<Forbidden/>}/><Route element={<SystemLayout/>}><Route path="/admin" element={<Admin/>}/><Route path="/pdv" element={<Pos/>}/><Route path="/caixa" element={<Cash/>}/><Route path="/financeiro" element={<Finance/>}/><Route path="/relatorios" element={<Reports/>}/><Route path="/equipe" element={<Team/>}/><Route path="/rh" element={<HR/>}/><Route path="/ponto" element={<TimeClock/>}/><Route path="/auditoria" element={<Audit/>}/><Route path="/perfil" element={<StaffProfile/>}/><Route path="/configuracoes" element={<Navigate to="/admin?tab=Personalizar" replace/>}/></Route><Route path="*" element={<NotFound/>}/></Routes></Suspense><UserMenu/></BrowserRouter></AppErrorBoundary>}
+function App(){return <AppErrorBoundary><BrowserRouter><Suspense fallback={<LoadingScreen/>}><Routes><Route path="/" element={<Navigate to="/loja" replace/>}/><Route path="/loja" element={<Store/>}/><Route path="/produto/:id" element={<Product/>}/><Route path="/login" element={<Login/>}/><Route path="/minha-conta" element={<Account/>}/><Route path="/checkout" element={<Checkout/>}/><Route path="/doar" element={<Donate/>}/><Route path="/comprovante/:id" element={<Receipt/>}/><Route path="/etiqueta/:id" element={<Label/>}/><Route path="/403" element={<Forbidden/>}/><Route element={<SystemLayout/>}><Route path="/admin" element={<Admin/>}/><Route path="/pdv" element={<Pos/>}/><Route path="/caixa" element={<Cash/>}/><Route path="/financeiro" element={<Finance/>}/><Route path="/relatorios" element={<Reports/>}/><Route path="/equipe" element={<Team/>}/><Route path="/rh" element={<HR/>}/><Route path="/ponto" element={<TimeClock/>}/><Route path="/auditoria" element={<Audit/>}/><Route path="/perfil" element={<StaffProfile/>}/><Route path="/configuracoes" element={<Navigate to="/admin?tab=Personalizar" replace/>}/></Route><Route path="*" element={<NotFound/>}/></Routes></Suspense><UserMenu/></BrowserRouter></AppErrorBoundary>}
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App/></React.StrictMode>);
