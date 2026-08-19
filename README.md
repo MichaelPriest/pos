@@ -63,6 +63,7 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 3. Cadastre todas as variáveis de `.env.example` em **Settings → Environment Variables**. As variáveis públicas do Vite usam o prefixo `VITE_`; os tokens privados continuam disponíveis somente nas funções `/api`.
 4. No painel da Stripe, cadastre o webhook `https://SEU-SITE/api/payments/webhook?provider=stripe` e copie o segredo para `STRIPE_WEBHOOK_SECRET`. Mercado Pago e PagBank recebem a URL automaticamente.
    Selecione os eventos `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` e `checkout.session.expired`. Eventos como `setup_intent.created` são autenticados e confirmados com HTTP 200, mas não alteram pedidos porque ainda não representam um pagamento.
+   Em **Stripe → Settings → Business → Branding**, configure o nome público, logo, ícone e cores da loja. O texto exibido pelo Link, inclusive “Área restrita padrão”, vem do perfil comercial da conta Stripe e não pode ser substituído pela API. Em **Payment methods**, desative o Link caso queira exibir somente cartão.
 5. Faça um novo deploy. O comando padrão `npm run build` já está configurado.
 
 ## Rotas
