@@ -48,7 +48,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `020`).
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `021`).
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -81,6 +81,8 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
 As rotas sensíveis de pagamento, conciliação, cadastro de funcionários e cofre possuem limite distribuído de requisições. A migration `020_api_rate_limits.sql` mantém os contadores no Supabase, funcionando mesmo quando a Vercel alterna entre diferentes instâncias serverless, e armazena apenas hashes dos endereços de origem.
 
 O cadastro de funcionários possui compensação automática: se o perfil ou os dados funcionais falharem depois da criação no Supabase Auth, o usuário incompleto é removido. O cofre administrativo valida as respostas do banco, rejeita segredos inválidos e permite remover credenciais antigas com segurança.
+
+O despacho é realizado pela RPC transacional `dispatch_order`: somente pedidos pagos podem ser enviados, e atualização do pedido, código de rastreio, histórico logístico e notificação do cliente são gravados na mesma transação.
 
 ## Rotas
 
