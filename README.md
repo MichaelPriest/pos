@@ -129,3 +129,7 @@ A migração `025_checkout_key_type.sql` corrige a comparação de `checkout_key
 ### Navegação global e RH
 
 A área restrita possui grupos recolhíveis por domínio. A página de RH oferece pesquisa, filtros por departamento e situação, acesso ao cadastro funcional e exportação CSV do quadro exibido.
+
+### Gestão financeira
+
+A página financeira inclui contas a pagar e receber, pesquisa e filtros combináveis, identificação de vencimentos, baixa de lançamentos e exportação CSV do resultado filtrado.
