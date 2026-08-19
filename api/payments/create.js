@@ -13,13 +13,18 @@ const providers = {
 };
 async function parse(response){const data=await response.json();if(!response.ok)throw new Error(data.error?.message||data.message||'O provedor recusou o pagamento.');return data;}
 async function providerSecret(provider,base,service){const response=await fetch(`${base}/rest/v1/integration_secrets?provider=eq.${provider}&select=encrypted_value`,{headers:{apikey:service,Authorization:`Bearer ${service}`}}),rows=await response.json();return rows[0]?.encrypted_value?decrypt(rows[0].encrypted_value):null;}
+export function normalizeOrderId(value){const candidate=Array.isArray(value)?value[0]?.id||value[0]:value?.id||value;return typeof candidate==='string'?candidate.replace(/^"|"$/g,'').trim():'';}
 export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({message:'Método não permitido'});
   try{
-    const {order_id,provider}=req.body; const supabase=(process.env.VITE_SUPABASE_URL||process.env.NEXT_PUBLIC_SUPABASE_URL); const anon=(process.env.VITE_SUPABASE_ANON_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY); const service=process.env.SUPABASE_SERVICE_ROLE_KEY; const token=req.headers.authorization?.replace('Bearer ','');
-    if(!token||!providers[provider])return res.status(400).json({message:'Pagamento inválido.'});
+    const order_id=normalizeOrderId(req.body?.order_id);
+    const provider=req.body?.provider; const supabase=(process.env.VITE_SUPABASE_URL||process.env.NEXT_PUBLIC_SUPABASE_URL); const anon=(process.env.VITE_SUPABASE_ANON_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY); const service=process.env.SUPABASE_SERVICE_ROLE_KEY; const token=req.headers.authorization?.replace('Bearer ','');
+    if(!supabase||!anon||!service)return res.status(503).json({message:'Integração com o Supabase incompleta na Vercel.'});
+    if(!token||!providers[provider]||!order_id)return res.status(400).json({message:'Pagamento inválido.'});
     const userResponse=await fetch(`${supabase}/auth/v1/user`,{headers:{apikey:anon,Authorization:`Bearer ${token}`}});if(!userResponse.ok)return res.status(401).json({message:'Sessão expirada.'});const user=await userResponse.json();
-    const orderResponse=await fetch(`${supabase}/rest/v1/orders?id=eq.${encodeURIComponent(order_id)}&customer_id=eq.${user.id}&select=*`,{headers:{apikey:service,Authorization:`Bearer ${service}`}});const orders=await orderResponse.json();if(!orders[0])return res.status(404).json({message:'Pedido não encontrado.'});
+    const orderResponse=await fetch(`${supabase}/rest/v1/orders?id=eq.${encodeURIComponent(order_id)}&customer_id=eq.${encodeURIComponent(user.id)}&select=*`,{headers:{apikey:service,Authorization:`Bearer ${service}`}});const orders=await orderResponse.json();
+    if(!orderResponse.ok)return res.status(502).json({message:orders?.message||'Não foi possível consultar o pedido no Supabase.'});
+    if(!Array.isArray(orders)||!orders[0])return res.status(404).json({message:`Pedido ${order_id.slice(0,8)} não encontrado para esta conta.`});
     const secret=await providerSecret(provider,supabase,service);const origin=process.env.SITE_URL||`https://${req.headers.host}`;const payment=await providers[provider](orders[0],origin,user.email,secret);
     await fetch(`${supabase}/rest/v1/orders?id=eq.${order_id}`,{method:'PATCH',headers:{apikey:service,Authorization:`Bearer ${service}`,'Content-Type':'application/json'},body:JSON.stringify({payment_provider:provider,payment_reference:payment.reference})});
     return res.status(200).json(payment);
