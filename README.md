@@ -80,6 +80,8 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
 
 As rotas sensíveis de pagamento, conciliação, cadastro de funcionários e cofre possuem limite distribuído de requisições. A migration `020_api_rate_limits.sql` mantém os contadores no Supabase, funcionando mesmo quando a Vercel alterna entre diferentes instâncias serverless, e armazena apenas hashes dos endereços de origem.
 
+O cadastro de funcionários possui compensação automática: se o perfil ou os dados funcionais falharem depois da criação no Supabase Auth, o usuário incompleto é removido. O cofre administrativo valida as respostas do banco, rejeita segredos inválidos e permite remover credenciais antigas com segurança.
+
 ## Rotas
 
 | Rota | Acesso | Uso |
