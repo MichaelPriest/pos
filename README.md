@@ -76,6 +76,7 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
    Em **Stripe → Settings → Business → Branding**, configure o nome público, logo, ícone e cores da loja. O texto exibido pelo Link, inclusive “Área restrita padrão”, vem do perfil comercial da conta Stripe e não pode ser substituído pela API. Em **Payment methods**, desative o Link caso queira exibir somente cartão.
 5. Faça um novo deploy. O comando padrão `npm run build` já está configurado.
 6. Configure `CRON_SECRET` na Vercel. A tarefa diária `/api/orders/expire` cancela reservas não pagas que já ultrapassaram 24 horas, devolvendo estoque e uso de cupom de forma transacional. Em planos que aceitem maior frequência, o agendamento pode ser alterado sem modificar a regra de expiração no banco.
+7. Após o deploy, consulte `/api/health` para validar banco, autenticação e presença das integrações sem expor qualquer segredo. O GitHub Actions também executa testes e build a cada push e pull request.
 
 ## Rotas
 
@@ -86,6 +87,8 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
 | `/favoritos` | Somente cliente | Lista de desejos persistente e sincronizada com a conta |
 | `/notificacoes` | Somente cliente | Atualizações de pagamento, pedido e rastreamento |
 | `/login` | Público | Login e cadastro |
+| `/esqueci-senha` | Público | Solicitação segura de recuperação de senha |
+| `/redefinir-senha` | Link de recuperação | Validação do token e cadastro da nova senha |
 | `/minha-conta` | Somente cliente | Pedidos, endereços, doações e dados |
 | `/checkout` | Somente cliente | Entrega, frete e pagamento |
 | `/perfil` | Somente equipe | Perfil profissional isolado |

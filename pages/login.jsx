@@ -27,7 +27,8 @@ export default function Login() {
     <section className="auth-form-wrap"><form className="auth-form" onSubmit={submit}><span className="auth-mobile-logo">ReVeste</span><p className="eyebrow">SUA CONTA</p><h2>{register ? 'Crie sua conta' : 'Que bom ter você de volta'}</h2><p>{register ? 'Cadastre-se para acompanhar seus pedidos.' : 'Entre para continuar suas compras.'}</p>
       {register && <label>Nome completo<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Como podemos te chamar?" /></label>}
       <label>E-mail<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="voce@email.com" /></label>
-      <label>Senha<input required minLength="6" type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="Mínimo de 6 caracteres" /></label>
+      <label>Senha<input required minLength="8" type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="Mínimo de 8 caracteres" /></label>
+      {!register&&<Link href="/esqueci-senha" className="forgot-password">Esqueci minha senha</Link>}
       {status.error && <div className="form-message">{status.error}</div>}
       <button className="shop-primary" disabled={status.loading}>{status.loading ? 'Aguarde...' : register ? 'Criar minha conta' : 'Entrar'}</button>
       <div className="auth-switch">{register ? 'Já tem uma conta?' : 'Ainda não tem conta?'} <button type="button" onClick={()=>{setRegister(!register);setStatus({loading:false,error:''})}}>{register ? 'Entrar' : 'Cadastre-se grátis'}</button></div>
