@@ -1,0 +1,2 @@
+import { Children, useEffect } from 'react';
+export default function Head({children}){useEffect(()=>{Children.forEach(children,child=>{if(child?.type==='title')document.title=String(child.props.children);if(child?.type==='meta'&&child.props.name){let meta=document.querySelector(`meta[name="${child.props.name}"]`);if(!meta){meta=document.createElement('meta');meta.name=child.props.name;document.head.appendChild(meta)}meta.content=child.props.content||''}})},[children]);return null}
