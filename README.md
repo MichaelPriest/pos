@@ -18,6 +18,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Conciliação de pagamento por webhook e consulta direta à operadora: pedidos pendentes não entram no faturamento; cancelamentos devolvem o estoque de forma idempotente.
 - Retomada segura de pagamentos pendentes pela conta do cliente, reutilizando a cobrança ainda aberta sem criar pedidos duplicados.
 - Painel admin protegido por perfil, com métricas, gráficos, produtos, pedidos e clientes.
+- Backoffice corporativo com financeiro, contas a pagar/receber, cadastro separado de funcionários, RH e ponto eletrônico.
 - Editor visual da marca: nome, slogan, cores, logo e banner publicados em tempo real.
 - Upload de fotos e logo em JPG, PNG ou WebP, salvos em Base64 diretamente no banco.
 - Segurança por Row Level Security (RLS): clientes só acessam os próprios pedidos; somente admins alteram o catálogo.
@@ -83,6 +84,10 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 | `/relatorios` | Admin ou gerente | Indicadores e exportação |
 | `/caixa` | Admin, gerente ou caixa | Abertura, movimentação e fechamento |
 | `/configuracoes` | Admin ou gerente | Configurações e identidade da loja |
+| `/financeiro` | Admin ou gerente | Fluxo financeiro e lançamentos |
+| `/equipe` | Apenas admin | Funcionários e acessos |
+| `/rh` | Admin ou gerente | Quadro e indicadores de RH |
+| `/ponto` | Equipe | Ponto eletrônico |
 
 - Checkout com máscaras brasileiras e endereço automático via BrasilAPI.
 - Canais configuráveis: Mercado Livre, Shopee, Meta, WhatsApp, X e TikTok.

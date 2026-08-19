@@ -19,9 +19,15 @@ const Reports = lazy(() => import('../pages/relatorios'));
 const StaffProfile = lazy(() => import('../pages/perfil'));
 const Receipt = lazy(() => import('../pages/comprovante/[id]'));
 const Label = lazy(() => import('../pages/etiqueta/[id]'));
+const Finance = lazy(() => import('../pages/financeiro'));
+const Team = lazy(() => import('../pages/equipe'));
+const HR = lazy(() => import('../pages/rh'));
+const TimeClock = lazy(() => import('../pages/ponto'));
+const Forbidden = lazy(() => import('../pages/forbidden'));
+const NotFound = lazy(() => import('../pages/not-found'));
 
 function LoadingScreen(){return <div className="route-loading"><span className="brand-mark">R</span><i/><p>Carregando...</p></div>}
 
-function App(){return <AppErrorBoundary><BrowserRouter><Suspense fallback={<LoadingScreen/>}><Routes><Route path="/" element={<Navigate to="/loja" replace/>}/><Route path="/loja" element={<Store/>}/><Route path="/login" element={<Login/>}/><Route path="/minha-conta" element={<Account/>}/><Route path="/checkout" element={<Checkout/>}/><Route path="/doar" element={<Donate/>}/><Route path="/comprovante/:id" element={<Receipt/>}/><Route path="/etiqueta/:id" element={<Label/>}/><Route element={<SystemLayout/>}><Route path="/admin" element={<Admin/>}/><Route path="/pdv" element={<Pos/>}/><Route path="/caixa" element={<Cash/>}/><Route path="/relatorios" element={<Reports/>}/><Route path="/perfil" element={<StaffProfile/>}/><Route path="/configuracoes" element={<Navigate to="/admin?tab=Personalizar" replace/>}/></Route><Route path="*" element={<Navigate to="/loja" replace/>}/></Routes></Suspense><UserMenu/></BrowserRouter></AppErrorBoundary>}
+function App(){return <AppErrorBoundary><BrowserRouter><Suspense fallback={<LoadingScreen/>}><Routes><Route path="/" element={<Navigate to="/loja" replace/>}/><Route path="/loja" element={<Store/>}/><Route path="/login" element={<Login/>}/><Route path="/minha-conta" element={<Account/>}/><Route path="/checkout" element={<Checkout/>}/><Route path="/doar" element={<Donate/>}/><Route path="/comprovante/:id" element={<Receipt/>}/><Route path="/etiqueta/:id" element={<Label/>}/><Route path="/403" element={<Forbidden/>}/><Route element={<SystemLayout/>}><Route path="/admin" element={<Admin/>}/><Route path="/pdv" element={<Pos/>}/><Route path="/caixa" element={<Cash/>}/><Route path="/financeiro" element={<Finance/>}/><Route path="/relatorios" element={<Reports/>}/><Route path="/equipe" element={<Team/>}/><Route path="/rh" element={<HR/>}/><Route path="/ponto" element={<TimeClock/>}/><Route path="/perfil" element={<StaffProfile/>}/><Route path="/configuracoes" element={<Navigate to="/admin?tab=Personalizar" replace/>}/></Route><Route path="*" element={<NotFound/>}/></Routes></Suspense><UserMenu/></BrowserRouter></AppErrorBoundary>}
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App/></React.StrictMode>);
