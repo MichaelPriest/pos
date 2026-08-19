@@ -48,7 +48,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `022`).
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `023`).
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -116,4 +116,4 @@ O despacho é realizado pela RPC transacional `dispatch_order`: somente pedidos 
 
 ### Integridade do caixa e do estoque
 
-A migração `022_cash_and_inventory_integrity.sql` impede mais de um caixa aberto por operador, valida sangrias contra o saldo disponível e agrupa itens repetidos antes de reservar estoque no PDV.
+As migrações `022_cash_and_inventory_integrity.sql` e `023_online_inventory_integrity.sql` impedem mais de um caixa aberto por operador, validam sangrias contra o saldo disponível e agrupam itens repetidos antes de reservar estoque no PDV e na loja online.
