@@ -182,3 +182,18 @@ create unique index if not exists orders_customer_checkout_key_unique on public.
 create or replace function public.create_order(payload jsonb) returns uuid language plpgsql security definer set search_path=public as $$
 declare new_id uuid;item jsonb;product_record products%rowtype;order_total numeric:=0;freight numeric:=0;profile_name text;request_key text;
 begin if auth.uid()is null or not exists(select 1 from profiles where id=auth.uid()and role='customer')then raise exception 'Entre com uma conta de cliente';end if;request_key:=nullif(payload->>'checkout_key','');if request_key is not null then select id into new_id from orders where customer_id=auth.uid()and checkout_key=request_key;if new_id is not null then return new_id;end if;end if;if jsonb_array_length(payload->'items')=0 then raise exception 'A sacola está vazia';end if;select name into profile_name from profiles where id=auth.uid();for item in select*from jsonb_array_elements(payload->'items')loop select*into product_record from products where id=(item->>'product_id')::uuid and active=true for update;if product_record.id is null or product_record.stock<(item->>'quantity')::int then raise exception 'Uma peça ficou indisponível';end if;order_total:=order_total+product_record.price*(item->>'quantity')::int;end loop;freight:=greatest(coalesce((payload->>'shipping_cost')::numeric,0),0);insert into orders(customer_id,customer_name,total,payment_method,shipping_address,shipping_service,shipping_cost,checkout_key)values(auth.uid(),profile_name,order_total+freight,coalesce(payload->>'payment_method','pix'),payload->'shipping_address',payload->>'shipping_method',freight,request_key)returning id into new_id;for item in select*from jsonb_array_elements(payload->'items')loop select*into product_record from products where id=(item->>'product_id')::uuid for update;insert into order_items(order_id,product_id,quantity,unit_price)values(new_id,product_record.id,(item->>'quantity')::int,product_record.price);update products set stock=stock-(item->>'quantity')::int,updated_at=now()where id=product_record.id;end loop;return new_id;exception when unique_violation then select id into new_id from orders where customer_id=auth.uid()and checkout_key=request_key;return new_id;end;$$;
+-- Módulo administrativo de campanhas e cupons.
+create table if not exists public.coupons (
+  id uuid primary key default gen_random_uuid(), code text not null unique,
+  discount_type text not null check(discount_type in ('percentage','fixed')),
+  discount_value numeric(10,2) not null check(discount_value > 0),
+  min_order_value numeric(10,2) not null default 0 check(min_order_value >= 0),
+  usage_limit integer not null default 100 check(usage_limit > 0), used_count integer not null default 0,
+  expires_at timestamptz, active boolean not null default true,
+  created_by uuid default auth.uid() references profiles(id), created_at timestamptz not null default now()
+);
+alter table public.coupons enable row level security;
+create policy "cupons publicos ativos" on public.coupons for select using(active=true or is_admin());
+create policy "admin cria cupons" on public.coupons for insert with check(is_admin());
+create policy "admin atualiza cupons" on public.coupons for update using(is_admin());
+create policy "admin exclui cupons" on public.coupons for delete using(is_admin());
