@@ -48,7 +48,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `015`).
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `016`).
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -64,7 +64,7 @@ Em **Supabase → Project Settings → API**, copie a URL e a chave pública `an
 
 ### Imagens e Supabase Storage
 
-A migration `015_storage_media.sql` cria buckets para catálogo, identidade visual e avatares, com limites de tamanho, formatos permitidos e políticas por perfil. Os novos uploads guardam somente a URL no banco, evitando o crescimento e a lentidão causados por Base64. Imagens antigas em Base64 continuam visíveis e podem ser migradas simplesmente reenviando o arquivo no painel.
+As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam buckets para catálogo, identidade visual, avatares e doações, com limites de tamanho, formatos permitidos e políticas por perfil. Fotos de doações ficam privadas e são exibidas por links temporários assinados. Os novos uploads guardam somente a URL ou referência do arquivo no banco, evitando o crescimento e a lentidão causados por Base64. Imagens antigas em Base64 continuam visíveis e podem ser migradas simplesmente reenviando o arquivo no painel.
 
 ## 3. GitHub e Vercel
 
