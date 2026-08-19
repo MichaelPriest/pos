@@ -3,22 +3,13 @@ import Link from '../src/shims/Link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from '../src/shims/router';
 import AuthGuard from '../components/AuthGuard';
-import { auth, db, getSession } from '../lib/supabase';
+import { auth, db, getSession, storage } from '../lib/supabase';
 
 const emptyProduct = { name:'', category:'Vestidos', size:'M', price:'', stock:1, image_url:'', description:'', active:true };
 const emptySettings = { store_name:'ReVeste', tagline:'', logo_url:'', primary_color:'#315d4a', accent_color:'#b36f53', hero_title:'', hero_subtitle:'', hero_image:'', whatsapp:'', instagram:'', facebook:'', x_url:'', tiktok:'', marketplace_mercadolivre:'', marketplace_shopee:'', support_email:'', free_shipping_threshold:250, pickup_enabled:true, maintenance_mode:false, seo_title:'', seo_description:'', stripe_enabled:false, mercadopago_enabled:true, pagbank_enabled:false, pix_enabled:true, card_enabled:true, cash_enabled:true };
 const money = value => Number(value || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
 const statuses = ['pendente','pago','separando','enviado','concluido','cancelado'];
 const paidStatuses = ['pago','separando','enviado','concluido'];
-
-const readImage = (file, callback) => {
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) return callback(null, 'A imagem deve ter no máximo 2 MB.');
-  const reader = new FileReader();
-  reader.onload = () => callback(reader.result);
-  reader.onerror = () => callback(null, 'Não foi possível ler a imagem.');
-  reader.readAsDataURL(file);
-};
 
 export default function Admin() {
   const router = useRouter();
@@ -43,8 +34,8 @@ export default function Admin() {
   const openProduct = product => { setEditing(product?.id || null); setForm(product ? {...product} : emptyProduct); setModal(true); };
   const saveProduct = async event => { event.preventDefault(); try { const data={...form,price:Number(form.price),stock:Number(form.stock)}; editing ? await db.updateProduct(editing,data) : await db.createProduct(data); setModal(false);setNotice(editing?'Produto atualizado.':'Produto cadastrado.');load(); } catch(error){setNotice(error.message);} };
   const saveSettings = async event => { event.preventDefault(); try { await db.updateSettings(settings);setNotice('Identidade visual publicada na loja.'); } catch(error){setNotice(error.message);} };
-  const imageField = (key, file) => readImage(file,(value,error)=>error?setNotice(error):setForm(current=>({...current,[key]:value})));
-  const settingImage = (key,file) => readImage(file,(value,error)=>error?setNotice(error):setSettings(current=>({...current,[key]:value})));
+  const imageField = async (key,file) => { try { setNotice('Enviando imagem...');const value=await storage.uploadImage('products',file,'catalog');setForm(current=>({...current,[key]:value}));setNotice('Imagem enviada com segurança.'); } catch(error){setNotice(error.message);} };
+  const settingImage = async (key,file) => { try { setNotice('Enviando imagem...');const value=await storage.uploadImage('branding',file,'identity');setSettings(current=>({...current,[key]:value}));setNotice('Imagem enviada com segurança.'); } catch(error){setNotice(error.message);} };
   const saveSecret=async provider=>{const token=getSession()?.access_token,response=await fetch('/api/admin/payment-settings',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({provider,secret:secretForm[provider]})}),data=await response.json();if(!response.ok)return setNotice(data.message);setSecrets({...secrets,[provider]:{configured:true,masked:'••••••••••••'}});setSecretForm({...secretForm,[provider]:''});setNotice('Credencial criptografada e salva com segurança.');};
   const verifyOrder=async order=>{try{setNotice(`Consultando pagamento do pedido ${order.id.slice(0,8)}...`);const result=await db.verifyPayment(order.id);setNotice(result.paid?'Pagamento confirmado pela operadora.':result.status==='cancelado'?'Pagamento cancelado ou expirado; estoque devolvido.':'Pagamento ainda não aprovado pela operadora.');load()}catch(error){setNotice(error.message)}};
   const shipment = async order => { const tracking_code=prompt('Código de rastreio:',order.tracking_code||'');if(!tracking_code)return;const carrier=order.carrier||order.shipping_service||'Correios';const tracking_url=prompt('Link de rastreio:',`https://rastreamento.correios.com.br/app/index.php?objetos=${tracking_code}`);const description=prompt('Atualização para o cliente:','Pedido postado e encaminhado à transportadora');const location=prompt('Localização atual:','Centro de distribuição');await db.updateShipment(order.id,{tracking_code,carrier,shipping_service:carrier,tracking_url,status:'enviado'});await db.addTrackingEvent({order_id:order.id,status:'enviado',description:description||'Pedido enviado',location});setNotice('Rastreio e histórico enviados ao cliente.');load(); };
