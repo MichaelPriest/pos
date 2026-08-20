@@ -1,0 +1,1 @@
+import{Link}from'react-router-dom';export default function NotFound(){return <main className="error-page"><span>404</span><h1>Página não encontrada</h1><p>O endereço informado não existe ou foi movido.</p><div><Link to="/loja">Ir para a loja</Link><Link to="/admin">Área administrativa</Link></div></main>}
