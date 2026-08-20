@@ -1,1 +1,0 @@
-import{Link}from'react-router-dom';export default function Forbidden(){return <main className="error-page"><span>403</span><h1>Acesso não autorizado</h1><p>Seu perfil não possui permissão para acessar este módulo.</p><div><Link to="/loja">Voltar à loja</Link><Link to="/perfil">Meu perfil</Link></div></main>}
