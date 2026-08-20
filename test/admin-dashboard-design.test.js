@@ -10,6 +10,8 @@ test('painel administrativo possui visão executiva baseada em dados reais', () 
   assert.match(admin, /DashboardHome/);
   assert.match(admin, /dashboard-period/);
   assert.match(admin, /Vendas da semana/);
+  assert.match(admin, /dashboard-line-chart/);
+  assert.match(admin, /chartPoints/);
   assert.match(admin, /Vendas recentes/);
   assert.match(admin, /Produtos em destaque/);
   assert.match(admin, /paidStatuses\.includes/);
@@ -20,6 +22,8 @@ test('layout administrativo oferece loja, busca, notificações e nova venda', (
   assert.match(layout, /system-global-search/);
   assert.match(layout, /Buscar produtos, clientes ou vendas/);
   assert.match(layout, /Nova venda/);
+  assert.match(layout, /sidebar-collapsed/);
+  assert.match(layout, /<Icon/);
 });
 
 test('conteúdo ocupa toda a área disponível ao lado da sidebar', () => {

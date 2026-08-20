@@ -19,5 +19,5 @@ test('checkout valida formato sem converter a coluna text para uuid', () => {
 test('sidebar organiza módulos em grupos recolhíveis', () => {
   for (const group of ['Visão geral','Comercial','Operação','Pessoas','Administração']) assert.match(layout, new RegExp(group));
   assert.match(layout, /<details/);
-  assert.match(layout, /<summary>/);
+  assert.match(layout, /<summary/);
 });
