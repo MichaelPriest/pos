@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { buildStripeCheckoutBody, normalizeOrderId, resumeExisting } from '../api/payments/create.js';
+import { buildStripeCheckoutBody, normalizeOrderId, paymentOrigin, providerEnabled, resumeExisting } from '../api/payments/create.js';
+import { gatewayIdempotencyKey } from '../lib/server/payment-security.js';
 
 const id = '7efb8f88-f39d-4729-9378-9a562f72e70e';
 
@@ -33,13 +35,46 @@ test('monta checkout Stripe em português com marca, e-mail e vínculo ao pedido
 test('retoma a mesma sessão Stripe enquanto a cobrança permanece aberta', async t => {
   const originalFetch = global.fetch;
   t.after(() => { global.fetch = originalFetch; });
-  global.fetch = async () => ({ ok:true, json:async()=>({ id:'cs_open', status:'open', url:'https://checkout.stripe.test/cs_open' }) });
-  assert.deepEqual(await resumeExisting({ payment_reference:'cs_open' }, 'stripe', 'sk_test'), { url:'https://checkout.stripe.test/cs_open', reference:'cs_open', resumed:true });
+  global.fetch = async () => ({ ok:true, json:async()=>({ id:'cs_open', status:'open', url:'https://checkout.stripe.test/cs_open', client_reference_id:id, amount_total:4990, currency:'brl' }) });
+  assert.deepEqual(await resumeExisting({ id, total:49.9, payment_reference:'cs_open' }, 'stripe', 'sk_test'), { url:'https://checkout.stripe.test/cs_open', reference:'cs_open', resumed:true });
 });
 
-test('não reutiliza cobrança Stripe expirada', async t => {
+test('identifica cobrança Stripe expirada para liberar a reserva', async t => {
   const originalFetch = global.fetch;
   t.after(() => { global.fetch = originalFetch; });
-  global.fetch = async () => ({ ok:true, json:async()=>({ id:'cs_expired', status:'expired' }) });
-  assert.equal(await resumeExisting({ payment_reference:'cs_expired' }, 'stripe', 'sk_test'), null);
+  global.fetch = async () => ({ ok:true, json:async()=>({ id:'cs_expired', status:'expired', client_reference_id:id, amount_total:4990, currency:'brl' }) });
+  assert.deepEqual(await resumeExisting({ id, total:49.9, payment_reference:'cs_expired' }, 'stripe', 'sk_test'), { expired:true, reference:'cs_expired' });
+});
+
+test('só habilita combinações coerentes de provedor e meio de pagamento', () => {
+  const settings = { stripe_enabled:true, mercadopago_enabled:false, pagbank_enabled:true, pix_enabled:true, card_enabled:true };
+  assert.equal(providerEnabled('stripe', 'cartao', settings), true);
+  assert.equal(providerEnabled('stripe', 'pix', settings), false);
+  assert.equal(providerEnabled('pagbank', 'pix', settings), true);
+  assert.equal(providerEnabled('mercadopago', 'pix', settings), false);
+});
+
+test('usa uma chave de idempotência estável por pedido e provedor', () => {
+  assert.equal(gatewayIdempotencyKey(id, 'stripe'), `reveste:stripe:${id}`);
+  const source = readFileSync(new URL('../api/payments/create.js', import.meta.url), 'utf8');
+  assert.match(source, /'Idempotency-Key': idempotencyKey/);
+  assert.match(source, /'X-Idempotency-Key': idempotencyKey/);
+  assert.match(source, /'x-idempotency-key': idempotencyKey/);
+});
+
+test('não deriva URLs de pagamento de um Host não confiável em produção', t => {
+  const originalSite = process.env.SITE_URL;
+  const originalProductionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const originalNodeEnv = process.env.NODE_ENV;
+  t.after(() => {
+    if (originalSite === undefined) delete process.env.SITE_URL; else process.env.SITE_URL = originalSite;
+    if (originalProductionUrl === undefined) delete process.env.VERCEL_PROJECT_PRODUCTION_URL; else process.env.VERCEL_PROJECT_PRODUCTION_URL = originalProductionUrl;
+    if (originalNodeEnv === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = originalNodeEnv;
+  });
+  delete process.env.SITE_URL;
+  delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  process.env.NODE_ENV = 'production';
+  assert.throws(() => paymentOrigin({ headers:{ host:'attacker.test' } }), /SITE_URL/);
+  process.env.SITE_URL = 'https://brecho.test/path';
+  assert.equal(paymentOrigin({ headers:{ host:'attacker.test' } }), 'https://brecho.test');
 });

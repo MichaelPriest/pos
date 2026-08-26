@@ -20,5 +20,5 @@ export default async function handler(req,res){
   ]);
   const status=healthStatus(checks);
   res.setHeader('Cache-Control','no-store');
-  return res.status(status==='healthy'?200:503).json({status,checks,services:{stripe:Boolean(process.env.STRIPE_SECRET_KEY),mercadopago:Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN),pagbank:Boolean(process.env.PAGBANK_TOKEN),webhook_signature:Boolean(process.env.STRIPE_WEBHOOK_SECRET)},checked_at:new Date().toISOString()});
+  return res.status(status==='healthy'?200:503).json({status,checks,services:{stripe:Boolean(process.env.STRIPE_SECRET_KEY),mercadopago:Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN),pagbank:Boolean(process.env.PAGBANK_TOKEN),stripe_webhook_signature:Boolean(process.env.STRIPE_WEBHOOK_SECRET),mercadopago_webhook_signature:Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET)},checked_at:new Date().toISOString()});
 }

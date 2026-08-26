@@ -15,7 +15,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Loja pública responsiva com busca, categorias, catálogo e carrinho.
 - Cadastro e login de clientes com histórico de pedidos.
 - Endereços reutilizáveis e idempotentes: compras repetidas atualizam o mesmo endereço, permitem escolher o principal e não criam duplicatas.
-- Checkout transacional: o preço é calculado no banco e o estoque é baixado com trava contra vendas duplicadas.
+- Checkout transacional: produtos, descontos e frete são calculados no banco, com trava contra vendas duplicadas.
 - Cupons integrados ao checkout com validação de validade, limite de usos, pedido mínimo e cálculo transacional no banco.
 - Conciliação de pagamento por webhook e consulta direta à operadora: pedidos pendentes não entram no faturamento; cancelamentos devolvem o estoque de forma idempotente.
 - Retomada segura de pagamentos pendentes pela conta do cliente, reutilizando a cobrança ainda aberta sem criar pedidos duplicados.
@@ -28,7 +28,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Pagamentos integrados por Stripe, Mercado Pago e PagBank, sem expor tokens no navegador.
 - Rastreamento de entregas com transportadora, código e link visível na conta do cliente.
 - Portal de doações com fotos, solicitação de coleta e acompanhamento pelo cliente e pela loja.
-- PDV para vendas presenciais com busca, estoque em tempo real, desconto, cliente e Pix/cartão/dinheiro.
+- PDV para vendas presenciais em dinheiro, com busca, estoque em tempo real, desconto autorizado e cliente. Pix/cartão aguardam conciliação com adquirente.
 - Perfis separados para cliente, operador de caixa, estoque, gerente e administrador.
 - Relatórios por período, indicadores, categorias mais vendidas e exportação CSV.
 - Catálogo com filtros avançados por categoria, tamanho, faixa de preço e ordenação.
@@ -36,7 +36,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Configuração dos processadores e meios de pagamento sem expor a marca do gateway ao cliente.
 - Linha do tempo de rastreamento, opções logísticas, etiquetas de embalagem e tabelas com pesquisa e paginação.
 - Menu de perfil com foto e atalhos conforme o nível de acesso.
-- Recibos não fiscais e espelho de cupom fiscal para impressão no PDV.
+- Recibos não fiscais para impressão no PDV; emissão fiscal fica bloqueada até existir integração homologada.
 - Cofre criptografado de chaves de pagamento acessível somente pelo administrador.
 - Modo manutenção que bloqueia o catálogo e todas as vendas online.
 - Checkout completo com contato, CPF/CNPJ, endereço, frete, retirada e revisão do pagamento.
@@ -48,7 +48,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `025`).
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `026`).
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -71,7 +71,7 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
 1. Envie o repositório ao GitHub.
 2. Importe-o na Vercel.
 3. Cadastre todas as variáveis de `.env.example` em **Settings → Environment Variables**. As variáveis públicas do Vite usam o prefixo `VITE_`; os tokens privados continuam disponíveis somente nas funções `/api`.
-4. No painel da Stripe, cadastre o webhook `https://SEU-SITE/api/payments/webhook?provider=stripe` e copie o segredo para `STRIPE_WEBHOOK_SECRET`. Mercado Pago e PagBank recebem a URL automaticamente.
+4. No painel da Stripe, cadastre o webhook `https://SEU-SITE/api/payments/webhook?provider=stripe` e copie o segredo para `STRIPE_WEBHOOK_SECRET`. No Mercado Pago, copie a assinatura secreta do webhook para `MERCADOPAGO_WEBHOOK_SECRET`. Mercado Pago e PagBank recebem a URL automaticamente ao criar cobranças.
    Selecione os eventos `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` e `checkout.session.expired`. Eventos como `setup_intent.created` são autenticados e confirmados com HTTP 200, mas não alteram pedidos porque ainda não representam um pagamento.
    Em **Stripe → Settings → Business → Branding**, configure o nome público, logo, ícone e cores da loja. O texto exibido pelo Link, inclusive “Área restrita padrão”, vem do perfil comercial da conta Stripe e não pode ser substituído pela API. Em **Payment methods**, desative o Link caso queira exibir somente cartão.
 5. Faça um novo deploy. O comando padrão `npm run build` já está configurado.
