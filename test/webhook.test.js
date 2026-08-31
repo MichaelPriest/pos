@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import test from 'node:test';
-import { verifyStripeSignature } from '../api/payments/webhook.js';
+import { mapPaymentStatus, verifyStripeSignature } from '../api/payments/webhook.js';
 
 const secret = 'whsec_test';
 const timestamp = 1_686_089_970;
@@ -19,4 +19,10 @@ test('aceita uma das múltiplas assinaturas durante rotação de segredo', () =>
 test('recusa assinatura inválida ou com mais de cinco minutos', () => {
   assert.throws(() => verifyStripeSignature(raw, `t=${timestamp},v1=${'0'.repeat(64)}`, secret, timestamp * 1000), /inválida/);
   assert.throws(() => verifyStripeSignature(raw, `t=${timestamp},v1=${signature}`, secret, (timestamp + 301) * 1000), /expirada/);
+});
+
+test('normaliza estados externos antes de conciliar o pedido',()=>{
+  for(const status of ['approved','paid','PAID','COMPLETED'])assert.equal(mapPaymentStatus(status),'pago');
+  for(const status of ['cancelled','canceled','CANCELED','rejected','DECLINED','expired','EXPIRED'])assert.equal(mapPaymentStatus(status),'cancelado');
+  for(const status of ['pending','IN_ANALYSIS',undefined])assert.equal(mapPaymentStatus(status),'pendente');
 });

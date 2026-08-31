@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { decrypt } from '../admin/payment-settings.js';
 
 export const config = { api: { bodyParser: false } };
 const readBody = req => new Promise((resolve, reject) => {
@@ -8,9 +9,17 @@ const readBody = req => new Promise((resolve, reject) => {
   req.on('error', reject);
 });
 
-const mapStatus = status => ['approved', 'paid', 'PAID', 'complete'].includes(status)
+export const mapPaymentStatus = status => ['approved', 'paid', 'PAID', 'complete', 'COMPLETED'].includes(status)
   ? 'pago'
-  : ['cancelled', 'canceled', 'rejected', 'DECLINED', 'expired'].includes(status) ? 'cancelado' : 'pendente';
+  : ['cancelled', 'canceled', 'CANCELED', 'rejected', 'DECLINED', 'expired', 'EXPIRED'].includes(status) ? 'cancelado' : 'pendente';
+
+async function providerSecret(provider) {
+  const base=process.env.VITE_SUPABASE_URL||process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if(!base||!key)return null;
+  const response=await fetch(`${base}/rest/v1/integration_secrets?provider=eq.${encodeURIComponent(provider)}&select=encrypted_value`,{headers:{apikey:key,Authorization:`Bearer ${key}`}});
+  const rows=response.ok?await response.json():[];
+  return rows[0]?.encrypted_value?decrypt(rows[0].encrypted_value):null;
+}
 
 export function verifyStripeSignature(raw, header, secret, now = Date.now()) {
   if (!secret || !header) throw new Error('Assinatura Stripe ausente');
@@ -38,7 +47,7 @@ async function updateOrder(orderId, status, reference) {
   const response = await fetch(`${base}/rest/v1/rpc/reconcile_order_payment`, {
     method: 'POST',
     headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ p_order_id: orderId, p_status: mapStatus(status), p_reference: String(reference || '') }),
+    body: JSON.stringify({ p_order_id: orderId, p_status: mapPaymentStatus(status), p_reference: String(reference || '') }),
   });
   if (!response.ok) throw new Error('Não foi possível conciliar o pedido');
 }
@@ -93,7 +102,9 @@ export default async function handler(req, res) {
       if (!id) throw new Error('Pagamento Mercado Pago ausente');
       claimed = await eventStore(provider, payload.id || String(id), payload, 'claim');
       if (!claimed) return res.status(200).json({ received:true, duplicate:true, event_id:payload.id || String(id) });
-      const response = await fetch(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` } });
+      const secret=await providerSecret('mercadopago')||process.env.MERCADOPAGO_ACCESS_TOKEN;
+      if(!secret)throw new Error('Credencial Mercado Pago não configurada');
+      const response = await fetch(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${secret}` } });
       const payment = await response.json();
       if (!response.ok) throw new Error('Notificação Mercado Pago inválida');
       await updateOrder(payment.external_reference, payment.status, payment.id);
