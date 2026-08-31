@@ -6,7 +6,7 @@ const groups = [
   { label:'Comercial', icon:'🛍️', open:false, links:[['/admin?tab=Produtos','📦','Produtos'],['/admin?tab=Estoque','🏷️','Estoque'],['/admin?tab=Pedidos','🧾','Pedidos'],['/admin?tab=Logística','🚚','Logística'],['/admin?tab=Cupons','🎟️','Cupons']] },
   { label:'Operação', icon:'⚙️', open:false, links:[['/pdv','🛒','Frente de caixa'],['/caixa','💵','Controle de caixa'],['/financeiro','💳','Financeiro'],['/relatorios','📊','Relatórios']] },
   { label:'Pessoas', icon:'👥', open:false, links:[['/admin?tab=Clientes','👤','Clientes'],['/admin?tab=Doações','💚','Doações'],['/equipe','🧑‍💼','Funcionários'],['/rh','🗂️','RH'],['/ponto','⏱️','Ponto eletrônico']] },
-  { label:'Administração', icon:'🛡️', open:false, links:[['/auditoria','🛡️','Auditoria'],['/configuracoes','⚙️','Configurações']] },
+  { label:'Administração', icon:'🛡️', open:false, links:[['/admin?tab=Integrações','🔌','Integrações'],['/auditoria','🛡️','Auditoria'],['/configuracoes','⚙️','Configurações']] },
 ];
 
 export default function SystemLayout(){
