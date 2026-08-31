@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildStripeCheckoutBody, normalizeOrderId, resumeExisting } from '../api/payments/create.js';
+import { buildStripeCheckoutBody, normalizeOrderId, resumeExisting, validatePaymentAvailability } from '../api/payments/create.js';
 
 const id = '7efb8f88-f39d-4729-9378-9a562f72e70e';
 
@@ -42,4 +42,15 @@ test('não reutiliza cobrança Stripe expirada', async t => {
   t.after(() => { global.fetch = originalFetch; });
   global.fetch = async () => ({ ok:true, json:async()=>({ id:'cs_expired', status:'expired' }) });
   assert.equal(await resumeExisting({ payment_reference:'cs_expired' }, 'stripe', 'sk_test'), null);
+});
+
+test('backend respeita processadores e métodos habilitados no checkout', () => {
+  const enabled={stripe_enabled:true,mercadopago_enabled:true,pagbank_enabled:true,pix_enabled:true,card_enabled:true};
+  assert.equal(validatePaymentAvailability('stripe','cartao',enabled,'sk_test'),true);
+  assert.equal(validatePaymentAvailability('mercadopago','pix',enabled,'APP_USR-test'),true);
+  assert.equal(validatePaymentAvailability('pagbank','pix',enabled,'token-test'),true);
+  assert.throws(()=>validatePaymentAvailability('stripe','cartao',{...enabled,stripe_enabled:false},'sk_test'),/desativado/);
+  assert.throws(()=>validatePaymentAvailability('mercadopago','pix',{...enabled,pix_enabled:false},'token-test'),/Pix está desativado/);
+  assert.throws(()=>validatePaymentAvailability('stripe','pix',enabled,'sk_test'),/somente para cartão/);
+  assert.throws(()=>validatePaymentAvailability('pagbank','cartao',enabled,'token-test'),/somente para Pix/);
 });
