@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { enforceRateLimit } from '../../lib/server/rate-limit.js';
 
-const providers=['stripe','mercadopago','pagbank','mercadolivre','shopee','meta'];
+export const providers=['stripe','mercadopago','pagbank','mercadolivre','shopee','meta','whatsapp','melhorenvio','correios'];
 const key=()=>{if(!process.env.APP_ENCRYPTION_KEY)throw new Error('APP_ENCRYPTION_KEY não configurada');return crypto.createHash('sha256').update(process.env.APP_ENCRYPTION_KEY).digest()};
 export const encrypt=value=>{const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',key(),iv),encrypted=Buffer.concat([cipher.update(value,'utf8'),cipher.final()]);return `${iv.toString('hex')}.${cipher.getAuthTag().toString('hex')}.${encrypted.toString('hex')}`};
 export const decrypt=value=>{const parts=String(value||'').split('.');if(parts.length!==3)throw new Error('Credencial criptografada inválida');const[iv,tag,data]=parts,decipher=crypto.createDecipheriv('aes-256-gcm',key(),Buffer.from(iv,'hex'));decipher.setAuthTag(Buffer.from(tag,'hex'));return Buffer.concat([decipher.update(Buffer.from(data,'hex')),decipher.final()]).toString()};
@@ -22,7 +22,7 @@ export default async function handler(req,res){
   try{
     if(!['GET','PUT','DELETE'].includes(req.method))return res.status(405).json({message:'Método não permitido'});
     const{base,service}=await context(req);
-    await enforceRateLimit(req,res,{base,service,scope:'admin-payment-settings',limit:30,windowSeconds:300});
+    await enforceRateLimit(req,res,{base,service,scope:'admin-integrations',limit:30,windowSeconds:300});
     const headers={apikey:service,Authorization:`Bearer ${service}`,'Content-Type':'application/json'};
     if(req.method==='GET'){
       const response=await fetch(`${base}/rest/v1/integration_secrets?select=provider,encrypted_value,updated_at`,{headers}),rows=await response.json();
