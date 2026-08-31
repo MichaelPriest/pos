@@ -17,3 +17,12 @@ test('credenciais permanecem protegidas e nunca são renderizadas',()=>{
   assert.match(hub,/type="password"/);
   assert.match(hub,/criptografadas no servidor/);
 });
+
+test('checkout só permite ativar provedores com credencial configurada',()=>{
+  assert.match(hub,/Disponibilidade no checkout/);
+  assert.match(hub,/disabled=\{!secrets\[provider\]\?\.configured\}/);
+  assert.match(hub,/pix_enabled/);
+  assert.match(hub,/card_enabled/);
+  assert.match(admin,/settingKey/);
+  assert.match(admin,/integração desativada/);
+});
