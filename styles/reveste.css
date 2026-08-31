@@ -154,6 +154,21 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
   .modal-overlay{align-items:flex-end}
   .product-modal,.shipment-modal,.cash-modal{width:100%;max-height:calc(100dvh - 16px);border-radius:16px 16px 0 0;padding-bottom:calc(22px + env(safe-area-inset-bottom))}
 }
+
+/* Customer shortcuts remain available throughout the mobile storefront */
+.customer-mobile-nav{display:none}
+@media(max-width:680px){
+  .customer-mobile-nav{position:fixed;inset:auto 0 0;z-index:85;display:grid;grid-template-columns:repeat(5,1fr);height:calc(68px + env(safe-area-inset-bottom));padding:5px 4px env(safe-area-inset-bottom);background:#fff;border-top:1px solid var(--line);box-shadow:0 -8px 25px #1832251c}
+  .customer-mobile-nav a{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;min-width:0;border-radius:9px;color:#53675d;font-size:11px;font-weight:700}
+  .customer-mobile-nav a i{font-size:21px;line-height:1;font-style:normal;font-weight:400}.customer-mobile-nav a span{white-space:nowrap}
+  .customer-mobile-nav a.active{background:#eaf2ee;color:var(--green)}
+  .store-page,.product-page,.favorites-page,.notifications-page,.customer-account,.donation-page,.account-page{padding-bottom:calc(68px + env(safe-area-inset-bottom))}
+  .shop-card>p{font-size:11px}.shop-card h3{font-size:16px}.shop-card strong{font-size:14px}
+  .store-benefits{font-size:12px;line-height:1.4}.section-kicker{font-size:10px}.catalog-empty p{font-size:13px}
+  .product-description{font-size:15px}.product-detail li,.product-detail .shop-primary{font-size:14px}.product-specs small{font-size:11px}.product-specs b{font-size:14px}
+  .favorites-grid small,.favorites-grid span,.favorites-grid button{font-size:12px}.favorites-grid h2{font-size:20px}
+  .notification-list small{font-size:11px}.notification-list h2{font-size:16px}.notification-list p{font-size:13px;line-height:1.5}.notification-list a,.notification-list>article>button{font-size:12px}
+}
 @media(max-width:520px){
   .store-header{height:64px;gap:8px}
   .store-tools{min-width:0;gap:4px}
