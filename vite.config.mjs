@@ -12,6 +12,6 @@ export default defineConfig(({ mode }) => {
     esbuild: { loader: 'jsx', include: /.*\.[jt]sx?$/ },
     optimizeDeps: { esbuildOptions: { loader: { '.js': 'jsx' } } },
     server: { port: 3000 },
-    build: { outDir: 'dist', sourcemap: true },
+    build: { outDir: 'dist', sourcemap: mode !== 'production' },
   };
 });

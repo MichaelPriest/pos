@@ -30,6 +30,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Portal de doações com fotos, solicitação de coleta e acompanhamento pelo cliente e pela loja.
 - PDV para vendas presenciais com busca, estoque em tempo real, desconto, cliente e Pix/cartão/dinheiro.
 - Perfis separados para cliente, operador de caixa, estoque, gerente e administrador.
+- Contador de notificações não lidas no menu do cliente, sincronizado após leitura e ao retornar para a loja, com histórico paginado.
 - Relatórios por período, indicadores, categorias mais vendidas e exportação CSV.
 - Catálogo com filtros avançados por categoria, tamanho, faixa de preço e ordenação.
 - Controle completo de caixa por operador: abertura, suprimento, sangria, vendas em dinheiro, conferência, diferença e fechamento.
@@ -48,7 +49,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `025`).
+2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `027`).
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -76,7 +77,11 @@ As migrations `015_storage_media.sql` e `016_private_donation_media.sql` criam b
    Em **Stripe → Settings → Business → Branding**, configure o nome público, logo, ícone e cores da loja. O texto exibido pelo Link, inclusive “Área restrita padrão”, vem do perfil comercial da conta Stripe e não pode ser substituído pela API. Em **Payment methods**, desative o Link caso queira exibir somente cartão.
 5. Faça um novo deploy. O comando padrão `npm run build` já está configurado.
 6. Configure `CRON_SECRET` na Vercel. A tarefa diária `/api/orders/expire` cancela reservas não pagas que já ultrapassaram 24 horas, devolvendo estoque e uso de cupom de forma transacional. Em planos que aceitem maior frequência, o agendamento pode ser alterado sem modificar a regra de expiração no banco.
-7. Após o deploy, consulte `/api/health` para validar banco, autenticação e presença das integrações sem expor qualquer segredo. O GitHub Actions também executa testes e build a cada push e pull request.
+7. Após o deploy, desative o modo manutenção e consulte `/api/health` para validar schema, autenticação, RPC atômica de webhooks, segredos operacionais e se ao menos um dos gateways habilitados possui credencial. Só libere vendas quando o endpoint responder `healthy` com HTTP 200. O GitHub Actions também executa testes e build a cada push e pull request.
+
+O deploy aplica CSP, HSTS, proteção contra frames e políticas restritivas de recursos. O build de produção não publica source maps; caso um novo domínio externo seja usado diretamente pelo navegador, revise explicitamente a diretiva correspondente em `vercel.json` em vez de remover a CSP.
+
+`SITE_URL` é obrigatória para cobranças e deve conter a origem HTTPS pública da loja, sem caminhos. Os webhooks do Mercado Pago e PagBank consultam a operadora com a credencial do cofre antes de conciliar o pedido; assim, o conteúdo recebido pela URL pública nunca é aceito isoladamente como confirmação de pagamento. A migration `027_atomic_webhook_claims.sql` impede processamento concorrente do mesmo evento e libera automaticamente, após cinco minutos, eventos interrompidos.
 
 As rotas sensíveis de pagamento, conciliação, cadastro de funcionários e cofre possuem limite distribuído de requisições. A migration `020_api_rate_limits.sql` mantém os contadores no Supabase, funcionando mesmo quando a Vercel alterna entre diferentes instâncias serverless, e armazena apenas hashes dos endereços de origem.
 
@@ -92,6 +97,9 @@ O despacho é realizado pela RPC transacional `dispatch_order`: somente pedidos 
 | `/produto/:id` | Público | Detalhes, disponibilidade e inclusão persistente na sacola |
 | `/favoritos` | Somente cliente | Lista de desejos persistente e sincronizada com a conta |
 | `/notificacoes` | Somente cliente | Atualizações de pagamento, pedido e rastreamento |
+| `/privacidade` | Público | Política de tratamento de dados |
+| `/termos` | Público | Termos de compra da loja |
+| `/trocas-e-devolucoes` | Público | Orientações de pós-venda |
 | `/login` | Público | Login e cadastro |
 | `/esqueci-senha` | Público | Solicitação segura de recuperação de senha |
 | `/redefinir-senha` | Link de recuperação | Validação do token e cadastro da nova senha |
@@ -125,6 +133,10 @@ A migração `024_audit_composite_keys.sql` permite auditar registros com chaves
 ### Checkout e navegação administrativa
 
 A migração `025_checkout_key_type.sql` corrige a comparação de `checkout_key` textual com UUID. A barra lateral administrativa organiza os módulos em grupos recolhíveis.
+
+### Precificação segura do checkout
+
+A migração `026_server_checkout_pricing.sql` calcula o frete no banco, valida os meios habilitados e impede que valores enviados pelo navegador alterem o total do pedido. Os preços do frete padrão e expresso são configuráveis no painel.
 
 ### Navegação global e RH
 
