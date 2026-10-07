@@ -56,7 +56,7 @@ export default async function handler(req,res){
   if(!base||!anon)return res.status(503).json({status:'unavailable',checks:[],message:'Supabase não configurado'});
   const publicHeaders={apikey:anon,Authorization:`Bearer ${anon}`};
   const serviceHeaders={apikey:service,Authorization:`Bearer ${service}`,'Content-Type':'application/json'};
-  const settingsUrl=`${base}/rest/v1/store_settings?id=eq.1&select=id,standard_shipping_cost,express_shipping_cost,maintenance_mode,stripe_enabled,mercadopago_enabled,pagbank_enabled,pix_enabled,card_enabled,shipping_origin_name,shipping_origin_email,shipping_origin_phone,shipping_origin_zip_code,shipping_origin_street,shipping_origin_number,shipping_origin_neighborhood,shipping_origin_city,shipping_origin_state,shipping_package_width,shipping_package_height,shipping_package_length,shipping_package_weight,shipping_document_mode,melhorenvio_sandbox`;
+  const settingsUrl=`${base}/rest/v1/store_settings?id=eq.1&select=id,standard_shipping_cost,express_shipping_cost,maintenance_mode,stripe_enabled,mercadopago_enabled,pagbank_enabled,pix_enabled,card_enabled`;
   let settings={},settingsCheck;
   try{const started=Date.now(),response=await fetch(settingsUrl,{headers:publicHeaders,signal:AbortSignal.timeout(4000)}),rows=response.ok?await response.json():[];settings=rows[0]||{};settingsCheck={name:'database_schema',ok:response.ok&&Boolean(settings.id),status:response.status,latency_ms:Date.now()-started}}catch(error){settingsCheck={name:'database_schema',ok:false,status:0,error:error.name==='TimeoutError'?'timeout':'unavailable'}}
   const infrastructure=await Promise.all([
@@ -67,6 +67,19 @@ export default async function handler(req,res){
   let vaultProviders=[];
   if(service){
     try{const response=await fetch(`${base}/rest/v1/integration_secrets?select=provider`,{headers:serviceHeaders,signal:AbortSignal.timeout(4000)});if(response.ok)vaultProviders=(await response.json()).map(item=>item.provider)}catch{}
+    try{
+      const response=await fetch(`${base}/rest/v1/shipping_settings?id=eq.1&select=*`,{headers:serviceHeaders,signal:AbortSignal.timeout(4000)});
+      if(response.ok){
+        const row=(await response.json())[0]||{};
+        settings={...settings,
+          shipping_origin_name:row.origin_name,shipping_origin_email:row.origin_email,shipping_origin_phone:row.origin_phone,
+          shipping_origin_zip_code:row.origin_zip_code,shipping_origin_street:row.origin_street,shipping_origin_number:row.origin_number,
+          shipping_origin_neighborhood:row.origin_neighborhood,shipping_origin_city:row.origin_city,shipping_origin_state:row.origin_state,
+          shipping_package_width:row.package_width,shipping_package_height:row.package_height,shipping_package_length:row.package_length,
+          shipping_package_weight:row.package_weight,shipping_document_mode:row.document_mode,melhorenvio_sandbox:row.melhorenvio_sandbox
+        };
+      }
+    }catch{}
   }
   const readiness=productionChecks(process.env,vaultProviders,settings),checks=[...infrastructure,...readiness.checks],status=healthStatus(checks);
   res.setHeader('Cache-Control','no-store');
