@@ -54,3 +54,8 @@ test('checkout mantém frete fixo e retirada como fallback',()=>{
   assert.ok(checkout.includes('Retirada na loja'));
   assert.ok(checkout.includes('Frete ao vivo indisponível; usando a tabela de frete da loja.'));
 });
+
+test('checkout do cliente nunca usa preços do Sandbox',()=>{
+  assert.ok(api.includes("settings.melhorenvio_sandbox!==false"));
+  assert.ok(api.includes('Frete ao vivo em homologação. Usando a tabela de frete da loja.'));
+});
