@@ -322,3 +322,8 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .consignment-return-panel h2{margin:0}
 .consignment-return-panel>div:first-child{display:flex;flex-direction:column;gap:4px}
 @media print{.consignment-return-panel{display:none!important}}
+
+.intake-margin-preview{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 12px;border:1px solid #d9e0dc;border-radius:10px;background:#f7faf8}
+.intake-margin-preview small{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.intake-margin-preview strong{font-size:16px;color:var(--green)}
+.intake-margin-preview span{font-size:10px;color:var(--muted)}
