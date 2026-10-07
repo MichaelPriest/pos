@@ -18,7 +18,7 @@ test('cupons ativos não podem ser enumerados por visitantes',()=>{
 
 test('funções internas de trigger não são RPCs públicas',()=>{
   for(const name of ['handle_new_user','notify_order_status','notify_tracking_event','write_audit_log','rls_auto_enable']){
-    assert.match(migration,new RegExp(`revoke execute on function public\\.${name}\\\\\\(\\\\\\) from public,anon,authenticated`,'i'));
+    assert.ok(migration.includes(`revoke execute on function public.${name}() from public,anon,authenticated;`));
   }
 });
 
