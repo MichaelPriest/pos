@@ -44,7 +44,8 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Área do cliente isolada da equipe, com pedidos, rastreamento, endereços, doações e dados pessoais.
 - Checkout idempotente contra pedidos duplicados, inclusive em duplo clique ou nova tentativa.
 - Pedidos separados por status, com datatable pesquisável e paginada.
-- Módulos administrativos dedicados para estoque, logística e campanhas de cupons.\n- Entrada e avaliação de peças por compra própria, consignação ou doação, com SKU, origem e rastreabilidade até a venda.\n- Consignação com cálculo automático de comissão/repasse e baixa integrada ao financeiro.\n- Trocas e devoluções operacionais com recebimento físico, retorno opcional ao estoque e confirmação manual do reembolso externo.
+- Módulos administrativos dedicados para estoque, logística e campanhas de cupons.\n- Entrada e avaliação de peças por compra própria, consignação ou doação, com SKU, origem e rastreabilidade até a venda.\n- Consignação com cálculo automático de comissão/repasse e baixa integrada ao financeiro.
+- Código de inventário por peça com fallback para itens legados, etiqueta Code 39 imprimível e leitura por SKU/código no PDV.\n- Trocas e devoluções operacionais com recebimento físico, retorno opcional ao estoque e confirmação manual do reembolso externo.
 
 ## 1. Criar o banco
 
