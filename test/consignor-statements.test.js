@@ -50,3 +50,14 @@ test('extrato não soma consignações canceladas nos indicadores',()=>{
   assert.ok(page.includes("filter(item=>item.status!=='cancelled').reduce"));
   assert.ok(page.includes("rows.filter(item=>item.status!=='cancelled').reduce"));
 });
+
+test('peça consignada pode ser devolvida ao proprietário antes da venda',async()=>{
+  const migration=await readFile(new URL('../supabase/migrations/038_return_unsold_consignment.sql',import.meta.url),'utf8');
+  assert.match(migration,/create or replace function public\.return_consigned_item/i);
+  assert.match(migration,/item\.status not in\('pending','listed'\)/i);
+  assert.match(migration,/source_type<>'consignment'/i);
+  assert.match(migration,/set active=false,stock=0/i);
+  assert.match(migration,/set status='returned'/i);
+  assert.ok(page.includes('Devolver ao proprietário'));
+  assert.ok(db.includes('returnConsignedItem:'));
+});
