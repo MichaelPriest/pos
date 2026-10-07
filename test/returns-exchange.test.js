@@ -23,8 +23,10 @@ test('abertura de pós-venda valida pedido e itens vendidos',()=>{
   assert.match(migration,/Este item já possui uma devolução ativa/i);
 });
 
-test('recebimento pode repor estoque sem executar estorno financeiro',()=>{
+test('recebimento reconcilia consignação antes de repor o estoque',()=>{
   assert.match(migration,/create or replace function public\.receive_order_return/i);
+  assert.match(migration,/cs\.status='paid'[\s\S]*Repasse de consignação já pago|Há repasse de consignação já pago/i);
+  assert.match(migration,/update public\.consignment_settlements cs[\s\S]*set status='cancelled'[\s\S]*cs\.status='pending'/i);
   assert.match(migration,/update public\.products set stock=stock\+item\.quantity,active=true/i);
   assert.match(migration,/set status=case when resolution='exchange' then 'completed' else 'received' end/i);
 });
