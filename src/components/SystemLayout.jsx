@@ -4,7 +4,7 @@ import StoreBrand from '../../components/StoreBrand';
 
 const groups = [
   { label:'Visão geral', icon:'🏠', open:true, links:[['/admin','🏠','Painel']] },
-  { label:'Comercial', open:false, icon:'🛍️', links:[['/admin?tab=Produtos','📦','Produtos'],['/admin?tab=Estoque','🏷️','Estoque'],['/entradas','📥','Entradas'],['/admin?tab=Pedidos','🧾','Pedidos'],['/admin?tab=Logística','🚚','Logística'],['/admin?tab=Cupons','🎟️','Cupons']] },
+  { label:'Comercial', open:false, icon:'🛍️', links:[['/admin?tab=Produtos','📦','Produtos'],['/admin?tab=Estoque','🏷️','Estoque'],['/entradas','📥','Entradas'],['/admin?tab=Pedidos','🧾','Pedidos'],['/trocas','↩️','Trocas e devoluções'],['/admin?tab=Logística','🚚','Logística'],['/admin?tab=Cupons','🎟️','Cupons']] },
   { label:'Operação', open:false, icon:'⚙️', links:[['/pdv','🛒','Frente de caixa'],['/caixa','💵','Controle de caixa'],['/financeiro','💳','Financeiro'],['/relatorios','📊','Relatórios']] },
   { label:'Pessoas', open:false, icon:'👥', links:[['/admin?tab=Clientes','👤','Clientes'],['/admin?tab=Doações','💚','Doações'],['/equipe','🧑‍💼','Funcionários'],['/rh','🗂️','RH'],['/ponto','⏱️','Ponto eletrônico']] },
   { label:'Administração', open:false, icon:'🛡️', links:[['/admin?tab=Integrações','🔌','Integrações'],['/auditoria','🛡️','Auditoria'],['/configuracoes','⚙️','Configurações']] },
