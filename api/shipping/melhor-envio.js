@@ -4,6 +4,16 @@ import { enforceRateLimit } from '../../lib/server/rate-limit.js';
 const digits=value=>String(value||'').replace(/\D/g,'');
 const positive=value=>Number.isFinite(Number(value))&&Number(value)>0;
 const required=(value,message)=>{const text=String(value||'').trim();if(!text)throw Object.assign(new Error(message),{statusCode:409});return text};
+const privateSettings=row=>({
+  shipping_origin_name:row.origin_name,shipping_origin_email:row.origin_email,shipping_origin_phone:row.origin_phone,
+  shipping_origin_document:row.origin_document,shipping_origin_company_document:row.origin_company_document,
+  shipping_origin_state_register:row.origin_state_register,shipping_origin_zip_code:row.origin_zip_code,
+  shipping_origin_street:row.origin_street,shipping_origin_number:row.origin_number,shipping_origin_complement:row.origin_complement,
+  shipping_origin_neighborhood:row.origin_neighborhood,shipping_origin_city:row.origin_city,shipping_origin_state:row.origin_state,
+  shipping_package_width:row.package_width,shipping_package_height:row.package_height,shipping_package_length:row.package_length,
+  shipping_package_weight:row.package_weight,shipping_document_mode:row.document_mode,
+  melhorenvio_sandbox:row.melhorenvio_sandbox,melhorenvio_auto_checkout:row.melhorenvio_auto_checkout
+});
 
 async function parse(response){
   const data=await response.json().catch(()=>({}));
@@ -26,8 +36,13 @@ async function load(base,service,orderId){
   const orderRes=await fetch(base+'/rest/v1/orders?id=eq.'+encodeURIComponent(orderId)+'&select=*,order_items(id,product_id,quantity,unit_price,products(name))&limit=1',{headers}),orders=await orderRes.json();
   if(!orderRes.ok)throw new Error(orders?.message||'Não foi possível consultar o pedido.');
   const order=orders[0];if(!order)throw Object.assign(new Error('Pedido não encontrado.'),{statusCode:404});
-  const [profileRes,settingsRes]=await Promise.all([fetch(base+'/rest/v1/profiles?id=eq.'+encodeURIComponent(order.customer_id)+'&select=name,email,phone,document&limit=1',{headers}),fetch(base+'/rest/v1/store_settings?id=eq.1&select=*&limit=1',{headers})]);
-  return{order,customer:(profileRes.ok?await profileRes.json():[])[0]||{},settings:(settingsRes.ok?await settingsRes.json():[])[0]||{}};
+  const [profileRes,storeRes,shippingRes]=await Promise.all([
+    fetch(base+'/rest/v1/profiles?id=eq.'+encodeURIComponent(order.customer_id)+'&select=name,email,phone,document&limit=1',{headers}),
+    fetch(base+'/rest/v1/store_settings?id=eq.1&select=support_email,free_shipping_threshold&limit=1',{headers}),
+    fetch(base+'/rest/v1/shipping_settings?id=eq.1&select=*&limit=1',{headers})
+  ]);
+  const store=(storeRes.ok?await storeRes.json():[])[0]||{},shipping=(shippingRes.ok?await shippingRes.json():[])[0]||{};
+  return{order,customer:(profileRes.ok?await profileRes.json():[])[0]||{},settings:{...store,...privateSettings(shipping)}};
 }
 async function secret(base,service){
   const response=await fetch(base+'/rest/v1/integration_secrets?provider=eq.melhorenvio&select=encrypted_value',{headers:{apikey:service,Authorization:'Bearer '+service}}),rows=response.ok?await response.json():[];
