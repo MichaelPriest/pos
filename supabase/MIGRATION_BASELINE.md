@@ -38,12 +38,12 @@ como não aplicadas e poderia tentar recriar objetos que já existem.
 ## Produção
 
 Em 07/10/2026, após validação transacional com `BEGIN/ROLLBACK`, foram
-aplicadas diretamente ao projeto Supabase real as migrations `026` a `037`
+aplicadas diretamente ao projeto Supabase real as migrations `026` a `038`
 necessárias para alinhar o banco ao código atual. Elas **continuam sem registro**
 em `supabase_migrations.schema_migrations`, porque o projeto remoto não possui
 histórico de migrations inicializado.
 
 Portanto, o banco já contém essas alterações, mas a regra permanece: **não usar
 `supabase db push` ainda**. A adoção do baseline deve primeiro reconciliar o
-estado remoto completo (001–037) com o Git e só então registrar o histórico como
+estado remoto completo (001–038) com o Git e só então registrar o histórico como
 aplicado.
