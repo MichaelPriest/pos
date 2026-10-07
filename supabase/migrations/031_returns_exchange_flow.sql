@@ -152,6 +152,26 @@ begin
   if target.id is null then raise exception 'Devolução não encontrada'; end if;
   if target.status not in('approved','requested') then return target.id; end if;
 
+  -- Uma venda consignada devolvida não pode manter repasse financeiro em aberto.
+  -- Se o repasse já saiu, a equipe precisa regularizar antes de receber a peça para
+  -- evitar devolver estoque e manter um pagamento irreversivelmente marcado como quitado.
+  if exists(
+    select 1
+      from public.order_return_items ri
+      join public.consignment_settlements cs on cs.order_item_id=ri.order_item_id
+     where ri.return_id=target.id
+       and cs.status='paid'
+  ) then
+    raise exception 'Há repasse de consignação já pago nesta devolução. Regularize o repasse antes de receber a peça';
+  end if;
+
+  update public.consignment_settlements cs
+     set status='cancelled'
+    from public.order_return_items ri
+   where ri.return_id=target.id
+     and ri.order_item_id=cs.order_item_id
+     and cs.status='pending';
+
   for item in select * from public.order_return_items where return_id=target.id and status='pending' for update
   loop
     if p_restock and item.product_id is not null then
