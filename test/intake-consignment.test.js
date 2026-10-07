@@ -79,3 +79,23 @@ test('entrada de peças suporta até cinco fotos e mantém dados repetitivos do 
   assert.ok(page.includes('brand:current.brand'));
   assert.ok(page.includes('condition_grade:current.condition_grade'));
 });
+
+test('lote de entrada é revisado antes de um único POST multi-row',async()=>{
+  const api=await readFile(new URL('../api/admin/intake-items-batch.js',import.meta.url),'utf8');
+  assert.ok(page.includes('batchItems'));
+  assert.ok(page.includes('intake-batch-review'));
+  assert.ok(page.includes('Salvar lote de '));
+  assert.ok(page.includes("fetch('/api/admin/intake-items-batch'"));
+  assert.ok(page.includes('items:batchItems'));
+  assert.ok(page.includes('removeBatchItem(index)'));
+  assert.ok(api.includes("['admin','manager','inventory'].includes"));
+  assert.ok(api.includes("items.length>50"));
+  assert.ok(api.includes("body:JSON.stringify(payload)"));
+  assert.ok(api.includes("Prefer:'return=representation'"));
+});
+
+test('trocar de entrada protege a lista ainda não salva',()=>{
+  assert.ok(page.includes("Trocar de entrada descarta a lista ainda não salva. Continuar?"));
+  assert.ok(page.includes('setBatchItems([])'));
+  assert.ok(page.includes('selectIntake(e.target.value)'));
+});
