@@ -2,7 +2,8 @@ import { useEffect,useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Head from '../src/shims/Head';
 import Link from '../src/shims/Link';
-import StoreBrand from '../components/StoreBrand';
+import CommerceHeader from '../components/CommerceHeader';
+import CommerceFooter from '../components/CommerceFooter';
 import { db } from '../lib/supabase';
 
 const documents={
@@ -31,5 +32,5 @@ export default function LegalPage(){
   const [settings,setSettings]=useState({store_name:'ReVeste'});
   useEffect(()=>{db.settings().then(value=>value&&setSettings(value)).catch(()=>{})},[]);
   const contact=settings.support_email||settings.whatsapp||'canal de atendimento informado na loja';
-  return <main className="legal-page"><Head><title>{document.title} | {settings.store_name}</title></Head><header><Link href="/loja"><StoreBrand/></Link><Link href="/loja">← Voltar à loja</Link></header><article><p className="eyebrow">TRANSPARÊNCIA E CONFIANÇA</p><h1>{document.title}</h1><p className="legal-intro">{document.intro}</p>{document.sections.map(([title,text])=><section key={title}><h2>{title}</h2><p>{text}</p></section>)}<section><h2>Contato</h2><p>Para dúvidas ou solicitações, utilize: <strong>{contact}</strong>.</p></section><small>Última atualização: 14 de setembro de 2026.</small></article><footer><Link href="/privacidade">Privacidade</Link><Link href="/termos">Termos de compra</Link><Link href="/trocas-e-devolucoes">Trocas e devoluções</Link></footer></main>;
+  return <main className="legal-page"><Head><title>{document.title} | {settings.store_name}</title></Head><CommerceHeader/><article><p className="eyebrow">TRANSPARÊNCIA E CONFIANÇA</p><h1>{document.title}</h1><p className="legal-intro">{document.intro}</p>{document.sections.map(([title,text])=><section key={title}><h2>{title}</h2><p>{text}</p></section>)}<section><h2>Contato</h2><p>Para dúvidas ou solicitações, utilize: <strong>{contact}</strong>.</p></section><small>Última atualização: 14 de setembro de 2026.</small></article><CommerceFooter/></main>;
 }
