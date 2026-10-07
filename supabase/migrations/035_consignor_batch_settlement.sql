@@ -32,13 +32,18 @@ begin
   end if;
 
   -- O FOR UPDATE garante que duas baixas simultâneas não paguem o mesmo repasse.
+  with locked as (
+    select id,payout_amount
+      from public.consignment_settlements
+     where consignor_id=p_consignor_id
+       and status='pending'
+       and available_at<=now()
+     order by id
+     for update
+  )
   select coalesce(sum(payout_amount),0),count(*)::integer
     into total,qty
-    from public.consignment_settlements
-   where consignor_id=p_consignor_id
-     and status='pending'
-     and available_at<=now()
-   for update;
+    from locked;
 
   if qty=0 or total<=0 then
     raise exception 'Nenhum repasse liberado para este consignante';
