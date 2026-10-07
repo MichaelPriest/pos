@@ -625,3 +625,16 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .cart-shipping-goal>i>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6f9a83,#315d4a);transition:width .25s}
 @media(max-width:1050px){.commerce-category-showcase>div:last-child{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.commerce-category-title{align-items:flex-start;flex-direction:column;gap:4px}.commerce-category-showcase>div:last-child{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:5px}.commerce-category-showcase button{flex:0 0 150px;min-height:104px;scroll-snap-align:start}}
+
+.account-tabs button{display:flex!important;align-items:center;gap:7px}
+.account-tabs button svg{width:17px;height:17px;flex:0 0 auto}
+.account-empty>span svg{width:30px;height:30px}
+.address-list article>span svg{width:22px;height:22px}
+.payment-pending-note span{display:flex;align-items:center;gap:6px}
+.payment-pending-note svg{width:16px;height:16px;flex:0 0 auto}
+.pos-search svg{width:18px;height:18px;flex:0 0 auto;color:#64786e}
+.empty-pos>span svg{width:34px;height:34px}
+.pos-payments button>svg{width:19px;height:19px}
+.pos-payments button>b{font-size:10px;letter-spacing:.05em}
+.cash-page .open-cash>span svg{width:34px;height:34px}
+.cash-modal>span svg{width:28px;height:28px}
