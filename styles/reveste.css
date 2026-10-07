@@ -255,3 +255,16 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
   .intake-item-form .form-row{grid-template-columns:1fr}
   .intake-piece-list{min-width:210px}
 }
+
+/* Trocas / devoluções */
+.return-form{display:grid;gap:14px}
+.return-order-items{display:grid;gap:8px;padding:10px;border:1px solid #dde5e0;border-radius:12px;background:#fafcfb}
+.return-item-row{display:grid;grid-template-columns:auto 1fr 90px;gap:10px;align-items:center;padding:9px;border-radius:9px;background:#fff}
+.return-item-row>span{display:flex;flex-direction:column;gap:2px}
+.return-item-row>span small{color:var(--muted)}
+.return-warning{padding:11px 12px;border-radius:10px;background:#fff4e6;color:#7a5620;font-size:11px;line-height:1.5}
+.return-pieces{display:flex;min-width:190px;flex-direction:column;gap:4px}
+.return-actions{display:flex;min-width:180px;flex-wrap:wrap;gap:6px}
+.return-actions button{padding:7px 9px;border:1px solid #b8c8be;border-radius:8px;background:#fff;color:var(--green);font-size:10px;font-weight:800;cursor:pointer}
+.return-actions button:hover{background:#edf4f0}
+@media(max-width:680px){.return-item-row{grid-template-columns:auto 1fr}.return-item-row>input[type=number]{grid-column:2}}
