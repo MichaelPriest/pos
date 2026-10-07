@@ -74,7 +74,7 @@ test('entrada de peças suporta até cinco fotos e mantém dados repetitivos do 
   assert.ok(page.includes("images:[...current.images,...urls].slice(0,5)"));
   assert.ok(page.includes('removeImage(index)'));
   assert.ok(page.includes('intake-photo-grid'));
-  assert.ok(page.includes('Adicionar e cadastrar próxima'));
+  assert.ok(page.includes('Adicionar à lista'));
   assert.ok(page.includes('category:current.category'));
   assert.ok(page.includes('brand:current.brand'));
   assert.ok(page.includes('condition_grade:current.condition_grade'));
