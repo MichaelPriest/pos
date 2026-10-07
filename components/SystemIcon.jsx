@@ -39,6 +39,7 @@ export default function SystemIcon({name,size=18}){
       case 'camera': return <><path d="M4 7h4l1.5-2h5L16 7h4v12H4V7Z"/><circle cx="12" cy="13" r="3"/></>;
       case 'logout': return <><path d="M10 5H5v14h5"/><path d="M13 8l4 4-4 4M9 12h8"/></>;
       case 'lock': return <><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></>;
+      case 'pin': return <><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></>;
       case 'menu': return <><path d="M4 7h16M4 12h16M4 17h16"/></>;
       case 'close': return <path d="m6 6 12 12M18 6 6 18"/>;
       default: return <circle cx="12" cy="12" r="8"/>;
