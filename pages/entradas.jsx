@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import AuthGuard from '../components/AuthGuard';
-import { db, storage } from '../lib/supabase';
+import { db, storage, getSession } from '../lib/supabase';
 
 const money=value=>Number(value||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const intakeInitial=()=>({source_type:'consignment',consignor_id:'',notes:''});
@@ -9,7 +9,7 @@ const itemInitial=()=>({name:'',description:'',category:'Feminino',brand:'',size
 export default function Entradas(){
   const [consignors,setConsignors]=useState([]),[intakes,setIntakes]=useState([]),[settlements,setSettlements]=useState([]);
   const [intakeForm,setIntakeForm]=useState(intakeInitial),[itemForm,setItemForm]=useState(itemInitial),[selectedIntake,setSelectedIntake]=useState('');
-  const [ownerForm,setOwnerForm]=useState({name:'',phone:'',document:'',pix_key:'',payout_days:'7'}),[notice,setNotice]=useState(''),[saving,setSaving]=useState(false),[uploading,setUploading]=useState(false);
+  const [ownerForm,setOwnerForm]=useState({name:'',phone:'',document:'',pix_key:'',payout_days:'7'}),[notice,setNotice]=useState(''),[saving,setSaving]=useState(false),[uploading,setUploading]=useState(false),[batchItems,setBatchItems]=useState([]);
 
   const load=()=>Promise.all([db.consignors(),db.inventoryIntakes(),db.consignmentSettlements()])
     .then(([owners,entries,payouts])=>{setConsignors(owners);setIntakes(entries);setSettlements(payouts)})
@@ -52,10 +52,19 @@ export default function Entradas(){
   }catch(error){setNotice(error.message)}finally{setUploading(false);event.target.value=''}};
   const removeImage=index=>setItemForm(current=>({...current,images:current.images.filter((_,i)=>i!==index)}));
 
-  const createItem=async event=>{event.preventDefault();if(!selectedIntake){setNotice('Selecione uma entrada antes de adicionar a peça.');return}setSaving(true);setNotice('');try{
-    await db.createInventoryIntakeItem({...itemForm,intake_id:selectedIntake,acquisition_cost:Number(itemForm.acquisition_cost||0),sale_price:Number(itemForm.sale_price),store_commission_percent:Number(itemForm.store_commission_percent)});
-    setItemForm(current=>({...itemInitial(),category:current.category,brand:current.brand,size:current.size,color:current.color,condition_grade:current.condition_grade,store_commission_percent:current.store_commission_percent}));setNotice('Peça adicionada. O formulário já está pronto para a próxima peça deste lote.');await load();
+  const createItem=event=>{event.preventDefault();if(!selectedIntake){setNotice('Selecione uma entrada antes de adicionar a peça.');return}
+    const draft={...itemForm,acquisition_cost:Number(itemForm.acquisition_cost||0),sale_price:Number(itemForm.sale_price),store_commission_percent:Number(itemForm.store_commission_percent)};
+    setBatchItems(current=>[...current,draft]);
+    setItemForm(current=>({...itemInitial(),category:current.category,brand:current.brand,size:current.size,color:current.color,condition_grade:current.condition_grade,store_commission_percent:current.store_commission_percent}));
+    setNotice('Peça adicionada à lista. Revise o lote e salve quando terminar.');
+  };
+  const removeBatchItem=index=>setBatchItems(current=>current.filter((_,i)=>i!==index));
+  const saveBatch=async()=>{if(!selectedIntake||!batchItems.length)return;setSaving(true);setNotice('');try{
+    const token=getSession()?.access_token,response=await fetch('/api/admin/intake-items-batch',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token||''}`},body:JSON.stringify({intake_id:selectedIntake,items:batchItems})}),data=await response.json();
+    if(!response.ok)throw new Error(data.message||'Não foi possível salvar o lote.');
+    setBatchItems([]);setNotice(data.count+' peça(s) salvas para avaliação em uma única operação.');await load();
   }catch(error){setNotice(error.message)}finally{setSaving(false)}};
+  const selectIntake=id=>{if(id!==selectedIntake&&batchItems.length&&!confirm('Trocar de entrada descarta a lista ainda não salva. Continuar?'))return;const entry=intakes.find(x=>x.id===id);if(id!==selectedIntake)setBatchItems([]);setSelectedIntake(id);setItemForm(current=>({...current,acquisition_cost:entry?.source_type==='purchase'?current.acquisition_cost:'0'}))};
 
   const approve=async id=>{setNotice('');try{await db.approveInventoryIntakeItem(id);setNotice('Peça aprovada e publicada no estoque.');await load()}catch(error){setNotice(error.message)}};
   const pay=async settlement=>{setNotice('');try{await db.payConsignmentSettlement(settlement.id,'Baixa manual pelo ReVeste');setNotice('Repasse registrado e lançado no financeiro.');await load()}catch(error){setNotice(error.message)}};
