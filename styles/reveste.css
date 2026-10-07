@@ -387,3 +387,9 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .admin-operational-grid b{margin-top:auto;padding-top:10px;font-size:9px;color:#557565}
 @media(max-width:1050px){.admin-operational-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.admin-operational-grid{grid-template-columns:1fr}.admin-operational-grid button{min-height:112px}}
+
+.intake-photo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.intake-photo-grid figure{position:relative;aspect-ratio:1;margin:0;overflow:hidden;border:1px solid #dbe3de;border-radius:10px;background:#f2f5f3}
+.intake-photo-grid img{width:100%;height:100%;object-fit:cover}
+.intake-photo-grid button{position:absolute;top:5px;right:5px;display:grid;place-items:center;width:24px;height:24px;border:0;border-radius:50%;background:#1d2f27cc;color:#fff;font-size:16px;cursor:pointer}
+@media(max-width:700px){.intake-photo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
