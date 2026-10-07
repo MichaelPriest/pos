@@ -70,3 +70,12 @@ test('impressão persiste estado e despacho Melhor Envio reutiliza despacho tran
   assert.ok(admin.includes('db.dispatchOrder'));
   assert.ok(admin.includes("order.tracking_code&&order.status!=='enviado'"));
 });
+
+test('Central de Integrações mostra checklist de homologação antes do checkout ao vivo',()=>{
+  assert.ok(hub.includes('Homologação Melhor Envio'));
+  assert.ok(hub.includes('shippingTokenReady'));
+  assert.ok(hub.includes('shippingOriginReady'));
+  assert.ok(hub.includes('shippingPackageReady'));
+  assert.ok(hub.includes('shippingDocumentReady'));
+  assert.ok(hub.includes('shippingLiveReady'));
+});
