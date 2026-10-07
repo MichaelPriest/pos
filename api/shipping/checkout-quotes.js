@@ -81,21 +81,22 @@ export default async function handler(req,res){
     const postal=digits(req.body?.postal_code);
     if(postal.length!==8)return res.status(400).json({message:'Informe um CEP válido.'});
     const couponCode=String(req.body?.coupon_code||'').trim().toUpperCase();
-    const[{subtotal,discount,coupon},settingsRes,token]=await Promise.all([
+    const[{subtotal,discount,coupon},storeRes,shippingRes,token]=await Promise.all([
       pricing(base,service,items,couponCode),
-      fetch(base+'/rest/v1/store_settings?id=eq.1&select=shipping_origin_email,support_email,shipping_origin_zip_code,shipping_package_width,shipping_package_height,shipping_package_length,shipping_package_weight,melhorenvio_sandbox,free_shipping_threshold&limit=1',{headers:{apikey:service,Authorization:'Bearer '+service}}),
+      fetch(base+'/rest/v1/store_settings?id=eq.1&select=support_email,free_shipping_threshold&limit=1',{headers:{apikey:service,Authorization:'Bearer '+service}}),
+      fetch(base+'/rest/v1/shipping_settings?id=eq.1&select=origin_email,origin_zip_code,package_width,package_height,package_length,package_weight,melhorenvio_sandbox&limit=1',{headers:{apikey:service,Authorization:'Bearer '+service}}),
       secret(base,service)
     ]);
     if(!token)return res.status(409).json({message:'Frete ao vivo ainda não configurado.'});
-    const settings=(settingsRes.ok?await settingsRes.json():[])[0]||{};
-    if(settings.melhorenvio_sandbox!==false)return res.status(409).json({message:'Frete ao vivo em homologação. Usando a tabela de frete da loja.'});
-    const origin=digits(settings.shipping_origin_zip_code);
+    const store=(storeRes.ok?await storeRes.json():[])[0]||{},shipping=(shippingRes.ok?await shippingRes.json():[])[0]||{};
+    if(shipping.melhorenvio_sandbox!==false)return res.status(409).json({message:'Frete ao vivo em homologação. Usando a tabela de frete da loja.'});
+    const origin=digits(shipping.origin_zip_code);
     if(origin.length!==8)return res.status(409).json({message:'CEP de origem ainda não configurado.'});
-    const volume={width:Number(settings.shipping_package_width),height:Number(settings.shipping_package_height),length:Number(settings.shipping_package_length),weight:Number(settings.shipping_package_weight)};
+    const volume={width:Number(shipping.package_width),height:Number(shipping.package_height),length:Number(shipping.package_length),weight:Number(shipping.package_weight)};
     if(!Object.values(volume).every(positive))return res.status(409).json({message:'Pacote padrão ainda não configurado.'});
-    const email=String(settings.shipping_origin_email||settings.support_email||'').trim();
+    const email=String(shipping.origin_email||store.support_email||'').trim();
     if(!email)return res.status(409).json({message:'E-mail técnico do frete ainda não configurado.'});
-    const sandbox=settings.melhorenvio_sandbox!==false;
+    const sandbox=shipping.melhorenvio_sandbox!==false;
     const url=(sandbox?'https://sandbox.melhorenvio.com.br':'https://www.melhorenvio.com.br')+'/api/v2/me/shipment/calculate';
     const response=await fetch(url,{method:'POST',headers:{Accept:'application/json',Authorization:'Bearer '+token,'Content-Type':'application/json','User-Agent':'ReVeste ('+email+')'},body:JSON.stringify({from:{postal_code:origin},to:{postal_code:postal},volumes:[volume],options:{insurance_value:Math.max(0,subtotal-discount),receipt:false,own_hand:false}})}).then(parse);
     const quotes=(Array.isArray(response)?response:[]).filter(item=>!item.error).map(item=>({service_id:String(item.id),service_name:String(item.name||'Serviço'),carrier:String(item.company?.name||'Transportadora'),quoted_amount:Number(item.custom_price??item.price??0),delivery_days:Number(item.custom_delivery_time??item.delivery_time??0)})).filter(item=>item.quoted_amount>0);
@@ -105,7 +106,7 @@ export default async function handler(req,res){
     const insertRes=await fetch(base+'/rest/v1/shipping_quotes',{method:'POST',headers:{apikey:service,Authorization:'Bearer '+service,'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify(insert)});
     const rows=await insertRes.json();
     if(!insertRes.ok)throw new Error(rows?.message||'Não foi possível registrar as cotações.');
-    const freeThreshold=Number(settings.free_shipping_threshold||0);
+    const freeThreshold=Number(store.free_shipping_threshold||0);
     const byService=new Map(quotes.map(quote=>[quote.service_id,quote]));
     return res.json({sandbox,quotes:rows.map(row=>({...byService.get(row.service_id),quote_id:row.id,customer_price:freeThreshold>0&&subtotal>=freeThreshold?0:Number(row.quoted_amount)}))});
   }catch(error){return res.status(error.statusCode||500).json({message:error.message})}
