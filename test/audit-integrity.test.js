@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const migration = readFileSync(new URL('../supabase/migrations/024_audit_composite_keys.sql', import.meta.url), 'utf8');
 const admin = readFileSync(new URL('../pages/admin.jsx', import.meta.url), 'utf8');
+const layout = readFileSync(new URL('../src/components/SystemLayout.jsx', import.meta.url), 'utf8');
 
 test('auditoria não presume que todo registro possui campo id', () => {
   assert.doesNotMatch(migration, /new\.id|old\.id/i);
@@ -16,7 +17,8 @@ test('auditoria retorna o registro correto em exclusões e alterações', () => 
   assert.match(migration, /return new;/);
 });
 
-test('painel usa somente a navegação lateral, sem abas duplicadas', () => {
+test('painel usa somente a navegação lateral global, sem shell legado duplicado', () => {
   assert.doesNotMatch(admin, /admin-module-tabs/);
-  assert.match(admin, /className="admin-side"/);
+  assert.doesNotMatch(admin, /className="admin-side"/);
+  assert.match(layout, /className="system-sidebar"/);
 });
