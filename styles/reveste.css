@@ -445,3 +445,51 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .commerce-footer-bottom{display:flex;justify-content:space-between;gap:16px;padding:17px clamp(20px,5vw,74px);border-top:1px solid rgba(255,255,255,.08);color:#8fa198;font-size:9px}
 @media(max-width:1100px){.commerce-header{grid-template-columns:auto 1fr auto}.commerce-header nav{display:none}.commerce-search{grid-column:2}.commerce-footer-main{grid-template-columns:1.5fr repeat(2,1fr)}.commerce-footer-main>div:nth-child(4){display:none}}
 @media(max-width:760px){.commerce-topbar{display:flex;justify-content:center;min-height:28px}.commerce-topbar span{display:none}.commerce-header{grid-template-columns:1fr auto;padding:10px 14px;gap:10px}.commerce-search{grid-column:1/-1;grid-row:2}.commerce-actions>a:nth-child(1){display:none}.commerce-bag span{display:none}.commerce-footer{margin-bottom:68px}.commerce-footer-main{grid-template-columns:1fr 1fr;gap:28px;padding:34px 20px}.commerce-footer-main>div:first-child{grid-column:1/-1}.commerce-footer-main>div:nth-child(4){display:none}.commerce-footer-bottom{flex-direction:column;padding:15px 20px}.commerce-footer-social{padding:0 20px 20px}}
+
+/* Ecommerce page refinement */
+.commerce-breadcrumb{display:flex;align-items:center;gap:8px;max-width:1240px;margin:18px auto 0;padding:0 clamp(18px,4vw,42px);color:#7d8a83;font-size:10px}
+.commerce-breadcrumb a{color:#557063;text-decoration:none}
+.commerce-breadcrumb b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#334b40}
+.product-page{background:linear-gradient(180deg,#fafcfb 0,#fff 42%);min-height:100vh}
+.product-page .product-detail{max-width:1240px;margin:0 auto;padding:28px clamp(18px,4vw,42px) 56px;gap:clamp(34px,6vw,78px)}
+.product-detail-image{border-radius:18px;overflow:hidden;box-shadow:0 18px 48px rgba(36,62,50,.11);background:#f0f3f1}
+.product-detail article{padding:18px 0}
+.product-detail article h1{font-size:clamp(30px,4vw,50px);line-height:1.04;letter-spacing:-.035em}
+.product-brand{margin:-5px 0 13px;color:#7b887f;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.product-price{font-size:25px;font-weight:850;color:#244f3b}
+.product-specs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important}
+.product-specs span{padding:12px 13px;border:1px solid #e1e7e3;border-radius:11px;background:#fbfcfb}
+.product-actions-commerce{display:grid!important;grid-template-columns:1fr 1fr auto;gap:9px!important}
+.buy-now-button{border:1px solid #315d4a;border-radius:10px;background:#fff;color:#315d4a;font-weight:800;cursor:pointer}
+.product-service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0}
+.product-service-grid span{display:flex;flex-direction:column;gap:3px;padding:11px;border:1px solid #e2e8e4;border-radius:10px;background:#f8faf9}
+.product-service-grid b{font-size:10px;color:#315d4a}
+.product-service-grid small{font-size:8px;color:#7d8b84;line-height:1.35}
+.favorites-page,.notifications-page,.customer-account,.donation-page{min-height:100vh;background:linear-gradient(180deg,#f7faf8 0,#fff 280px)}
+.favorites-heading,.notifications-shell,.account-body,.customer-heading,.account-tabs,.account-overview{max-width:1180px;margin-left:auto;margin-right:auto}
+.favorites-heading{padding:46px 24px 22px}
+.favorites-heading h1,.notifications-title h1,.customer-heading h1{letter-spacing:-.03em}
+.favorites-content{max-width:1180px;margin:0 auto;padding:0 24px 28px}
+.favorites-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important}
+.favorites-grid article{overflow:hidden;border:1px solid #e1e7e3!important;border-radius:14px!important;background:#fff;box-shadow:0 8px 28px rgba(38,66,53,.06)}
+.favorites-grid article>a{display:block;aspect-ratio:4/5;overflow:hidden;background:#f0f3f1}
+.favorites-grid article>a img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.favorites-grid article:hover>a img{transform:scale(1.025)}
+.favorite-card-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
+.favorite-card-actions .shop-primary{margin:0!important;padding:10px 12px!important}
+.account-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;padding:0 24px 20px}
+.account-overview article{display:flex;flex-direction:column;gap:4px;padding:17px;border:1px solid #e1e7e3;border-radius:13px;background:#fff;box-shadow:0 6px 24px rgba(38,66,53,.045)}
+.account-overview small{font-size:8px;font-weight:800;letter-spacing:.09em;color:#87948d}
+.account-overview strong{font-size:24px;color:#315d4a}
+.account-overview span{font-size:9px;color:#7c8982}
+.customer-heading{padding:40px 24px 22px}
+.account-tabs{padding-left:24px!important;padding-right:24px!important}
+.account-body{padding-left:24px!important;padding-right:24px!important;padding-bottom:32px!important}
+.customer-order{border-radius:14px!important;box-shadow:0 7px 24px rgba(39,66,53,.05)}
+.notifications-shell{padding:44px 24px 40px}
+.notification-list article{border-radius:13px!important;box-shadow:0 5px 18px rgba(39,66,53,.04)}
+.donation-page>section{max-width:1180px!important;margin:0 auto!important;padding:52px 24px!important;gap:54px!important}
+.donation-page>section>aside{position:sticky;top:118px;align-self:start}
+.donation-page form{border-radius:16px!important;box-shadow:0 12px 36px rgba(38,66,53,.08)}
+@media(max-width:900px){.favorites-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.account-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.donation-page>section{grid-template-columns:1fr!important}.donation-page>section>aside{position:static}.product-service-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.product-page .product-detail{padding-top:16px}.product-actions-commerce{grid-template-columns:1fr auto}.product-actions-commerce .buy-now-button{grid-column:1/-1;grid-row:2}.product-specs{grid-template-columns:1fr 1fr}.favorites-grid{grid-template-columns:1fr!important}.account-overview{grid-template-columns:1fr 1fr;padding:0 14px 16px}.favorites-heading,.favorites-content,.notifications-shell,.customer-heading,.account-body,.account-tabs{padding-left:14px!important;padding-right:14px!important}}
