@@ -317,3 +317,8 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
   .consignor-page table{font-size:9px}
   .consignor-page .ops-kpis article{border:1px solid #ddd}
 }
+
+.consignment-return-panel{display:grid;gap:14px;border-color:#e4cda6;background:#fffaf1}
+.consignment-return-panel h2{margin:0}
+.consignment-return-panel>div:first-child{display:flex;flex-direction:column;gap:4px}
+@media print{.consignment-return-panel{display:none!important}}
