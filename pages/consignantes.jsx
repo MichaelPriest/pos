@@ -6,10 +6,11 @@ const money=value=>Number(value||0).toLocaleString('pt-BR',{style:'currency',cur
 const date=value=>value?new Date(value).toLocaleDateString('pt-BR'):'—';
 
 export default function Consignantes(){
-  const [owners,setOwners]=useState([]),[settlements,setSettlements]=useState([]),[ownerId,setOwnerId]=useState(''),[status,setStatus]=useState('todos'),[notice,setNotice]=useState(''),[saving,setSaving]=useState(false);
+  const [owners,setOwners]=useState([]),[settlements,setSettlements]=useState([]),[intakes,setIntakes]=useState([]),[ownerId,setOwnerId]=useState(''),[status,setStatus]=useState('todos'),[notice,setNotice]=useState(''),[saving,setSaving]=useState(false);
+  const [returning,setReturning]=useState(null),[returnReason,setReturnReason]=useState('');
 
-  const load=()=>Promise.all([db.consignors(),db.consignmentSettlements()])
-    .then(([people,payouts])=>{setOwners(people);setSettlements(payouts);if(!ownerId&&people[0]?.id)setOwnerId(people[0].id)})
+  const load=()=>Promise.all([db.consignors(),db.consignmentSettlements(),db.inventoryIntakes()])
+    .then(([people,payouts,entries])=>{setOwners(people);setSettlements(payouts);setIntakes(entries);if(!ownerId&&people[0]?.id)setOwnerId(people[0].id)})
     .catch(error=>setNotice(error.message));
 
   useEffect(()=>{load()},[]);
@@ -25,6 +26,8 @@ export default function Consignantes(){
 
   const owner=owners.find(item=>item.id===ownerId);
   const ownerSettlements=settlements.filter(item=>item.consignor_id===ownerId);
+  const ownerPieces=intakes.filter(entry=>entry.source_type==='consignment'&&entry.consignor_id===ownerId)
+    .flatMap(entry=>(entry.inventory_intake_items||[]).map(item=>({...item,received_at:entry.received_at})));
   const pending=ownerSettlements.filter(item=>item.status==='pending');
   const released=pending.filter(item=>new Date(item.available_at).getTime()<=now);
   const waiting=pending.filter(item=>new Date(item.available_at).getTime()>now);
@@ -46,6 +49,17 @@ export default function Consignantes(){
       const result=await db.payConsignorSettlements(owner.id,'Repasse consolidado '+new Date().toLocaleDateString('pt-BR'));
       const item=Array.isArray(result)?result[0]:result;
       setNotice('Repasse concluído: '+(item?.settlements_count||released.length)+' item(ns), '+money(item?.total_amount||metrics.released)+'.');
+      await load();
+    }catch(error){setNotice(error.message)}finally{setSaving(false)}
+  };
+
+  const returnPiece=async()=>{
+    if(!returning)return;
+    setSaving(true);setNotice('');
+    try{
+      await db.returnConsignedItem(returning.id,returnReason);
+      setNotice('Peça devolvida ao proprietário e removida da loja/PDV.');
+      setReturning(null);setReturnReason('');
       await load();
     }catch(error){setNotice(error.message)}finally{setSaving(false)}
   };
@@ -88,6 +102,14 @@ export default function Consignantes(){
       <Kpi label="Aguardando prazo" value={money(metrics.waiting)}/>
       <Kpi label="Já pago" value={money(metrics.paid)}/>
     </section>
+
+    {returning&&<section className="ops-card consignment-return-panel no-print">
+      <div><h2>Devolver peça ao proprietário</h2><span>{returning.name} · {money(returning.sale_price)}</span></div>
+      <label>Motivo<textarea rows="3" value={returnReason} onChange={e=>setReturnReason(e.target.value)} placeholder="Ex.: prazo encerrado, solicitação do proprietário, peça sem giro..."/></label>
+      <div className="return-actions"><button className="shop-primary" disabled={saving} onClick={returnPiece}>{saving?'Registrando...':'Confirmar devolução'}</button><button disabled={saving} onClick={()=>{setReturning(null);setReturnReason('')}}>Cancelar</button></div>
+    </section>}
+
+    <section className="ops-card ops-table"><div><h2>Peças do proprietário</h2><span>{ownerPieces.length} peça(s) no histórico</span></div><div className="table-scroll"><table><thead><tr><th>Peça</th><th>Entrada</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ação</th></tr></thead><tbody>{ownerPieces.length?ownerPieces.map(item=>{const days=Math.max(0,Math.floor((now-new Date(item.received_at).getTime())/86400000));return <tr key={item.id}><td><b>{item.name}</b><small>{item.brand||''}{item.size?' · '+item.size:''}</small></td><td>{date(item.received_at)}<small>{days} dia(s)</small></td><td>{money(item.sale_price)}</td><td>{item.status==='listed'?'Na loja':item.status==='pending'?'Em avaliação':item.status==='sold'?'Vendida':item.status==='returned'?'Devolvida':'—'}</td><td>{item.status}{item.returned_at&&<small>{date(item.returned_at)}{item.return_reason?' · '+item.return_reason:''}</small>}</td><td>{['pending','listed'].includes(item.status)&&<button className="track-button no-print" onClick={()=>{setReturning(item);setReturnReason('')}}>Devolver ao proprietário</button>}</td></tr>}):<tr><td colSpan="6">Nenhuma peça consignada vinculada a este proprietário.</td></tr>}</tbody></table></div></section>
 
     <section className="ops-card ops-table"><div><h2>Extrato por peça</h2><span>{rows.length} lançamento(s)</span></div><div className="table-scroll"><table><thead><tr><th>Venda</th><th>Peça</th><th>Valor vendido</th><th>Comissão loja</th><th>Repasse</th><th>Liberação</th><th>Status</th></tr></thead><tbody>{rows.length?rows.map(item=>{const releasedNow=item.status==='pending'&&new Date(item.available_at).getTime()<=now;return <tr key={item.id}><td>{date(item.orders?.created_at)}<small>#{String(item.order_id).slice(0,8)}</small></td><td><b>{item.products?.name||'Peça'}</b><small>{item.products?.sku||''}</small></td><td>{money(item.gross_amount)}</td><td>{money(item.store_commission_amount)}<small>{Number(item.commission_percent)}%</small></td><td><b>{money(item.payout_amount)}</b></td><td>{date(item.available_at)}</td><td>{item.status==='paid'?'Pago':item.status==='cancelled'?'Cancelado':releasedNow?'Liberado':'Aguardando prazo'}</td></tr>}):<tr><td colSpan="7">Nenhum lançamento encontrado para este filtro.</td></tr>}</tbody></table></div></section>
 
