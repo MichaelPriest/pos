@@ -17,7 +17,7 @@ export default function Admin() {
   const [tab,setTab] = useState('Resumo');
   const [orderFilter,setOrderFilter] = useState('todos');
   const [products,setProducts] = useState([]), [orders,setOrders] = useState([]), [customers,setCustomers] = useState([]);
-  const [donations,setDonations] = useState([]);
+  const [donations,setDonations] = useState([]), [intakes,setIntakes] = useState([]), [returns,setReturns] = useState([]), [settlements,setSettlements] = useState([]);
   const [coupons,setCoupons] = useState([]), [couponForm,setCouponForm] = useState({code:'',discount_type:'percentage',discount_value:10,min_order_value:0,usage_limit:100,expires_at:'',active:true});
   const [settings,setSettings] = useState(emptySettings), [form,setForm] = useState(emptyProduct);
   const [modal,setModal] = useState(false), [editing,setEditing] = useState(null), [notice,setNotice] = useState('');
@@ -25,7 +25,7 @@ export default function Admin() {
   const [quoteOrder,setQuoteOrder] = useState(null), [shippingQuotes,setShippingQuotes] = useState([]), [quoting,setQuoting] = useState(false);
   const [shippingInvoiceKey,setShippingInvoiceKey] = useState(''), [shippingBusy,setShippingBusy] = useState(false);
   const [secrets,setSecrets] = useState({}), [secretForm,setSecretForm] = useState({}), [shippingSettings,setShippingSettings] = useState({melhorenvio_sandbox:true});
-  const load = () => Promise.all([db.products(false),db.orders(),db.profiles(),db.settings(),db.donations(),db.coupons()]).then(([p,o,c,s,d,cp]) => { setProducts(p);setOrders(o);setCustomers(c);setDonations(d);setCoupons(cp);if(s)setSettings(s); }).catch(e=>setNotice(e.message));
+  const load = () => Promise.all([db.products(false),db.orders(),db.profiles(),db.settings(),db.donations(),db.coupons(),db.inventoryIntakes(),db.orderReturns(),db.consignmentSettlements()]).then(([p,o,c,s,d,cp,ins,rets,sets]) => { setProducts(p);setOrders(o);setCustomers(c);setDonations(d);setCoupons(cp);setIntakes(ins);setReturns(rets);setSettlements(sets);if(s)setSettings(s); }).catch(e=>setNotice(e.message));
   useEffect(() => { load(); }, []);
   useEffect(()=>{const token=getSession()?.access_token;if(!token)return;Promise.all([fetch('/api/admin/payment-settings',{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.ok?r.json():{}),fetch('/api/admin/shipping-settings',{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.ok?r.json():{})]).then(([payment,shipping])=>{setSecrets(payment);setShippingSettings(shipping)})},[]);
   useEffect(() => { if (router.query.tab) setTab(String(router.query.tab)); }, [router.query.tab]);
@@ -34,6 +34,11 @@ export default function Admin() {
   const average = paidOrders.length ? revenue/paidOrders.length : 0;
   const monthly = useMemo(() => Array.from({length:6},(_,index)=>{const date=new Date();date.setMonth(date.getMonth()-(5-index));return {label:date.toLocaleDateString('pt-BR',{month:'short'}),value:paidOrders.filter(o=>{const d=new Date(o.created_at);return d.getMonth()===date.getMonth()&&d.getFullYear()===date.getFullYear()}).reduce((s,o)=>s+Number(o.total),0)}}),[paidOrders]);
   const maxMonth = Math.max(...monthly.map(x=>x.value),1);
+  const pendingIntakeItems = intakes.reduce((sum,entry)=>sum+(entry.inventory_intake_items||[]).filter(item=>item.status==='pending').length,0);
+  const openReturns = returns.filter(item=>['requested','approved','received'].includes(item.status)&&item.status!=='completed').length;
+  const releasedSettlements = settlements.filter(item=>item.status==='pending'&&new Date(item.available_at).getTime()<=Date.now());
+  const releasedSettlementAmount = releasedSettlements.reduce((sum,item)=>sum+Number(item.payout_amount||0),0);
+  const shippingQueue = orders.filter(order=>['pago','separando'].includes(order.status)&&order.shipping_service!=='Retirada na loja').length;
 
   const openProduct = product => { setEditing(product?.id || null); setForm(product ? {...product} : emptyProduct); setModal(true); };
   const saveProduct = async event => { event.preventDefault(); try { const data={...form,price:Number(form.price),stock:Number(form.stock)}; editing ? await db.updateProduct(editing,data) : await db.createProduct(data); setModal(false);setNotice(editing?'Produto atualizado.':'Produto cadastrado.');load(); } catch(error){setNotice(error.message);} };
