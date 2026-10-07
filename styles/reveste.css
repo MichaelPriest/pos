@@ -295,3 +295,25 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
   .no-print,.user-menu,.customer-mobile-nav,.system-mobile-shortcuts{display:none!important}
   @page{size:58mm 40mm;margin:0}
 }
+
+/* Consignantes / extrato */
+.ops-head-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ops-head-actions button{padding:9px 12px;border:1px solid #b8c8be;border-radius:9px;background:#fff;color:var(--green);font-weight:800;cursor:pointer}
+.consignor-selector{display:grid;grid-template-columns:minmax(220px,1fr) minmax(180px,.7fr) auto;gap:14px;align-items:end}
+.consignor-print-head{display:flex;justify-content:space-between;gap:24px;padding:18px 20px;border:1px solid #d9e0dc;border-radius:14px;background:#fff}
+.consignor-print-head>div{display:flex;flex-direction:column;gap:4px}
+.consignor-print-head h2{margin:0}
+.consignor-print-head small{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.consignor-print-head b{font-size:12px}
+.consignor-kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.consignor-print-footer{display:flex;justify-content:space-between;gap:18px;padding:12px 2px;color:var(--muted);font-size:10px}
+@media(max-width:900px){.consignor-selector{grid-template-columns:1fr 1fr}.consignor-selector .shop-primary{grid-column:1/-1}.consignor-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.consignor-selector{grid-template-columns:1fr}.consignor-print-head{flex-direction:column}.consignor-kpis{grid-template-columns:1fr}}
+@media print{
+  .consignor-page{padding:0!important;background:#fff!important}
+  .consignor-print-head,.consignor-page .ops-card,.consignor-kpis{box-shadow:none!important}
+  .consignor-page .ops-card{border:0!important;padding:0!important}
+  .consignor-page .table-scroll{overflow:visible!important}
+  .consignor-page table{font-size:9px}
+  .consignor-page .ops-kpis article{border:1px solid #ddd}
+}
