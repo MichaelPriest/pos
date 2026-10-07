@@ -37,11 +37,16 @@ test('workspace oferece extrato, CSV e baixa consolidada',()=>{
   assert.ok(page.includes('Imprimir extrato'));
   assert.ok(page.includes('Exportar CSV'));
   assert.ok(page.includes('payConsignorSettlements'));
-  assert.ok(page.includes('Pagar '+'' ) || page.includes("'Pagar '+money(metrics.released)"));
+  assert.ok(page.includes("'Pagar '+money(metrics.released)"));
   assert.ok(db.includes('payConsignorSettlements:'));
 });
 
 test('schema base inclui fechamento consolidado',()=>{
   assert.match(schema,/AUDIT-CONSIGNOR-BATCH-SETTLEMENT-2026-10/);
   assert.match(schema,/create or replace function public\.pay_consignor_settlements/i);
+});
+
+test('extrato não soma consignações canceladas nos indicadores',()=>{
+  assert.ok(page.includes("filter(item=>item.status!=='cancelled').reduce"));
+  assert.ok(page.includes("rows.filter(item=>item.status!=='cancelled').reduce"));
 });
