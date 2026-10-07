@@ -31,11 +31,14 @@ test('recebimento reconcilia consignação antes de repor o estoque',()=>{
   assert.match(migration,/set status=case when resolution='exchange' then 'completed' else 'received' end/i);
 });
 
-test('reembolso é confirmação manual e lança despesa somente depois do recebimento',()=>{
-  assert.match(migration,/create or replace function public\.confirm_manual_order_refund/i);
-  assert.match(migration,/if target\.status<>'received' then raise exception 'Receba a peça antes de confirmar o reembolso'/i);
-  assert.match(migration,/insert into public\.financial_entries/i);
-  assert.match(page,/não chama Stripe, Mercado Pago ou PagBank/i);
+test('reembolso mantém fallback manual e oferece estorno Stripe após recebimento',async()=>{
+  const gateway=await readFile(new URL('../supabase/migrations/036_gateway_refunds.sql',import.meta.url),'utf8');
+  assert.match(gateway,/create or replace function public\.confirm_manual_order_refund/i);
+  assert.match(gateway,/if target\.status<>'received' then raise exception 'Receba a peça antes de confirmar o reembolso'/i);
+  assert.match(gateway,/create or replace function public\.record_gateway_order_refund/i);
+  assert.match(page,/Estornar no Stripe/i);
+  assert.match(page,/Confirmar reembolso externo/i);
+  assert.match(page,/Mercado Pago, PagBank e outros meios continuam exigindo confirmação manual/i);
 });
 
 test('workspace está roteado e protegido para gestão',()=>{
@@ -46,7 +49,7 @@ test('workspace está roteado e protegido para gestão',()=>{
 });
 
 test('camada de dados cobre pós-venda',()=>{
-  for(const name of ['orderReturns','createOrderReturn','receiveOrderReturn','confirmManualOrderRefund']) assert.match(db,new RegExp(`\\b${name}\\b`));
+  for(const name of ['orderReturns','createOrderReturn','receiveOrderReturn','confirmManualOrderRefund','refundOrderReturn']) assert.match(db,new RegExp(`\\b${name}\\b`));
 });
 
 test('schema base inclui pós-venda',()=>{
