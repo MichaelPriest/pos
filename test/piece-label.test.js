@@ -16,8 +16,9 @@ test('barcode Code 39 possui tabela, start stop e normalização',()=>{
   assert.ok(barcode.includes('Código de barras'));
 });
 
-test('etiqueta interna usa SKU quando barcode não estiver preenchido',()=>{
-  assert.ok(page.includes("product?.barcode||product?.sku||''"));
+test('etiqueta interna usa código de inventário compartilhado',()=>{
+  assert.ok(page.includes("import { inventoryCode } from '../../lib/inventory-code'"));
+  assert.ok(page.includes('const code=inventoryCode(product)'));
   assert.ok(page.includes("AuthGuard roles={['admin','manager','inventory']}"));
   assert.ok(db.includes('productLabel: async'));
   assert.ok(db.includes('select=id,name,category,size,price,sku,barcode,brand,color,condition_grade,active'));
@@ -32,10 +33,17 @@ test('rota e ação de impressão ficam ligadas ao fluxo de entradas',()=>{
 });
 
 
-test('PDV pesquisa e adiciona peça por SKU ou barcode',()=>{
-  assert.ok(pdv.includes('[p.name,p.category,p.brand,p.sku,p.barcode]'));
-  assert.ok(pdv.includes("String(p.barcode||'').toUpperCase()===code"));
-  assert.ok(pdv.includes("String(p.sku||'').toUpperCase()===code"));
+test('PDV pesquisa e adiciona peça pelo código de inventário',()=>{
+  assert.ok(pdv.includes("import { inventoryCode } from '../lib/inventory-code'"));
+  assert.ok(pdv.includes('[p.name,p.category,p.brand,p.sku,p.barcode,inventoryCode(p)]'));
+  assert.ok(pdv.includes('products.find(p=>inventoryCode(p)===code)'));
   assert.ok(pdv.includes("if(match){e.preventDefault();add(match);setQuery('');setCategory('Todos')}"));
   assert.ok(pdv.includes('Nome, SKU ou código de barras...'));
+});
+
+test('código de inventário tem fallback estável para peça legada',async()=>{
+  const inventory=await readFile(new URL('../lib/inventory-code.js',import.meta.url),'utf8');
+  assert.ok(inventory.includes("product.barcode||product.sku||''"));
+  assert.ok(inventory.includes("'RV-'"));
+  assert.ok(inventory.includes('slice(0,10)'));
 });
