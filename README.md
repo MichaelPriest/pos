@@ -22,7 +22,7 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Painel admin protegido por perfil, com métricas, gráficos, produtos, pedidos e clientes.
 - Backoffice corporativo com financeiro, contas a pagar/receber, cadastro separado de funcionários, RH e ponto eletrônico com quatro marcações diárias.
 - Editor visual da marca: nome, slogan, cores, logo e banner publicados em tempo real.
-- Upload de fotos e logo em JPG, PNG ou WebP, salvos em Base64 diretamente no banco.
+- Upload de fotos e logo em JPG, PNG ou WebP pelo Supabase Storage; o banco guarda apenas a URL ou referência do arquivo.
 - Segurança por Row Level Security (RLS): clientes só acessam os próprios pedidos; somente admins alteram o catálogo.
 - Sessões com renovação automática, webhooks idempotentes e trilha de auditoria administrativa para operações críticas.
 - Pagamentos integrados por Stripe, Mercado Pago e PagBank, sem expor tokens no navegador.
@@ -44,12 +44,12 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Área do cliente isolada da equipe, com pedidos, rastreamento, endereços, doações e dados pessoais.
 - Checkout idempotente contra pedidos duplicados, inclusive em duplo clique ou nova tentativa.
 - Pedidos separados por status, com datatable pesquisável e paginada.
-- Módulos administrativos dedicados para estoque, logística e campanhas de cupons.
+- Módulos administrativos dedicados para estoque, logística e campanhas de cupons.\n- Entrada e avaliação de peças por compra própria, consignação ou doação, com SKU, origem e rastreabilidade até a venda.\n- Consignação com cálculo automático de comissão/repasse e baixa integrada ao financeiro.\n- Trocas e devoluções operacionais com recebimento físico, retorno opcional ao estoque e confirmação manual do reembolso externo.
 
 ## 1. Criar o banco
 
 1. Crie um projeto gratuito em [Supabase](https://supabase.com).
-2. Abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Se já instalou uma versão anterior, aplique em ordem apenas as migrations ainda pendentes da pasta `supabase/migrations` (atualmente `001` a `027`).
+2. Em instalação nova, abra **SQL Editor**, cole todo o conteúdo de `supabase/schema.sql` e execute. Em projeto existente, **não aplique migrations antigas por tentativa**. O projeto histórico do ReVeste foi criado por SQL direto e deve seguir o procedimento de adoção descrito em `supabase/MIGRATION_BASELINE.md` antes do primeiro `supabase db push`. As mudanças novas permanecem versionadas em `supabase/migrations`.
 3. Em **Authentication → URL Configuration**, informe a URL do site na Vercel.
 4. Cadastre sua conta em `/login` e execute a última instrução comentada do schema, trocando pelo seu e-mail, para conceder o perfil `admin`.
 
@@ -107,7 +107,7 @@ O despacho é realizado pela RPC transacional `dispatch_order`: somente pedidos 
 | `/checkout` | Somente cliente | Entrega, frete e pagamento |
 | `/perfil` | Somente equipe | Perfil profissional isolado |
 | `/equipe/:id` | Somente administrador | Cargo, permissão, salário e bloqueio do funcionário |
-| `/admin` | Apenas admin | Gestão completa |
+| `/admin` | Apenas admin | Gestão completa |\n| `/entradas` | Admin, gerente ou estoque | Entrada, avaliação e consignação de peças |\n| `/trocas` | Admin ou gerente | Trocas, devoluções e confirmação de reembolsos |
 | `/doar` | Cliente autenticado | Doação e coleta de peças |
 | `/pdv` | Admin, gerente ou caixa | Venda presencial |
 | `/relatorios` | Admin ou gerente | Indicadores e exportação |
