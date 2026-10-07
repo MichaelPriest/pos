@@ -17,9 +17,12 @@ alter table public.store_settings add column if not exists shipping_package_widt
 alter table public.store_settings add column if not exists shipping_package_height numeric(8,2);
 alter table public.store_settings add column if not exists shipping_package_length numeric(8,2);
 alter table public.store_settings add column if not exists shipping_package_weight numeric(8,3);
+alter table public.store_settings add column if not exists shipping_document_mode text check(shipping_document_mode in('declaration','invoice'));
 alter table public.store_settings add column if not exists melhorenvio_sandbox boolean not null default true;
 alter table public.store_settings add column if not exists melhorenvio_auto_checkout boolean not null default false;
 
+alter table public.orders add column if not exists shipping_invoice_key text;
+alter table public.orders add column if not exists shipping_dce_key text;
 alter table public.orders add column if not exists shipping_provider text;
 alter table public.orders add column if not exists shipping_service_id text;
 alter table public.orders add column if not exists shipping_provider_shipment_id text;
