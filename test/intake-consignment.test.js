@@ -56,3 +56,14 @@ test('schema base inclui o ciclo de entrada e consignação',()=>{
   assert.match(schema,/AUDIT-INTAKE-CONSIGNMENT-2026-10/);
   assert.match(schema,/create table if not exists public\.consignment_settlements/i);
 });
+
+test('compra própria gera custo financeiro apenas na aprovação',async()=>{
+  const finance=await readFile(new URL('../supabase/migrations/039_purchase_acquisition_finance.sql',import.meta.url),'utf8');
+  assert.match(finance,/source_type='purchase' and item\.acquisition_cost>0/i);
+  assert.match(finance,/category,'Compra de peças'/i);
+  assert.match(finance,/acquisition_financial_entry_id/i);
+  assert.ok(page.includes('Custo de aquisição'));
+  assert.ok(page.includes('Margem estimada do brechó'));
+  assert.ok(page.includes("selectedEntry?.source_type==='consignment'"));
+  assert.ok(page.includes("selectedEntry?.source_type==='purchase'"));
+});
