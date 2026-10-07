@@ -17,6 +17,7 @@ export default function CommerceHeader({cartCount,onCart,compact=false}){
       <form className="commerce-search" onSubmit={submit}><SystemIcon name="search"/><input value={search} onChange={event=>setSearch(event.target.value)} placeholder="Buscar peças, marcas..." aria-label="Buscar na loja"/><button type="submit" aria-label="Buscar"><SystemIcon name="external"/></button></form>
       <div className="commerce-actions">
         <Link href={signedIn?'/favoritos':'/login?next=/favoritos'} aria-label="Favoritos"><SystemIcon name="heart"/></Link>
+        <Link href={signedIn?'/notificacoes':'/login?next=/notificacoes'} aria-label="Notificações"><SystemIcon name="bell"/></Link>
         <Link href={signedIn?'/minha-conta':'/login'} aria-label={signedIn?'Minha conta':'Entrar'}><SystemIcon name="user"/></Link>
         {onCart?<button className="commerce-bag" onClick={onCart} aria-label={'Abrir sacola com '+count+' item(ns)'}><SystemIcon name="bag"/><span>Sacola</span>{count>0&&<b>{count}</b>}</button>:<Link href="/loja" className="commerce-bag"><SystemIcon name="bag"/><span>Sacola</span>{count>0&&<b>{count}</b>}</Link>}
       </div>
