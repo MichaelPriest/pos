@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { getSession } from '../lib/supabase';
 
 const systemPaths=['/admin','/entradas','/trocas','/pdv','/caixa','/financeiro','/relatorios','/equipe','/rh','/ponto','/auditoria','/perfil','/funcionario'];
-const hiddenPaths=['/login','/checkout','/esqueci-senha','/redefinir-senha','/comprovante','/etiqueta','/403'];
+const hiddenPaths=['/login','/checkout','/esqueci-senha','/redefinir-senha','/comprovante','/etiqueta','/etiqueta-peca','/403'];
 
 const icons={
   store:<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 5.2 4h13.6l2.2 6.5M4.5 10.5V20h15v-9.5M9 20v-6h6v6M3 10.5c.3 1.5 1.4 2.3 2.7 2.3 1.4 0 2.3-.8 2.7-2.3.4 1.5 1.4 2.3 2.8 2.3s2.4-.8 2.8-2.3c.3 1.5 1.3 2.3 2.7 2.3 1.3 0 2.4-.8 2.8-2.3"/></svg>,
