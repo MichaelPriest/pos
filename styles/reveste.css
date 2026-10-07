@@ -366,3 +366,13 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .logistics-readiness-grid .pending{background:#fff7e8;color:#8a5a12}
 .logistics-readiness-grid .pending b{background:#f6e4bf}
 @media(max-width:650px){.logistics-readiness-grid{grid-template-columns:1fr 1fr}}
+
+/* Ícones consistentes da navegação interna */
+.system-sidebar i,.system-mobile-shortcuts i,.mobile-page-group a i{display:grid;place-items:center}
+.system-sidebar i svg,.system-sidebar-bottom svg{width:18px;height:18px;flex:0 0 auto}
+.system-sidebar nav summary i svg{width:17px;height:17px}
+.system-mobile-shortcuts i svg{width:21px;height:21px}
+.mobile-page-group h3{display:flex;align-items:center;gap:7px}
+.mobile-page-group h3 svg{width:17px;height:17px;flex:0 0 auto}
+.mobile-page-group a i svg,.mobile-page-extra a i svg{width:19px;height:19px}
+.system-sidebar-bottom a>svg{width:17px;height:17px}
