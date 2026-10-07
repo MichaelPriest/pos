@@ -376,3 +376,14 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .mobile-page-group h3 svg{width:17px;height:17px;flex:0 0 auto}
 .mobile-page-group a i svg,.mobile-page-extra a i svg{width:19px;height:19px}
 .system-sidebar-bottom a>svg{width:17px;height:17px}
+
+/* Pendências operacionais do brechó */
+.admin-operational-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.admin-operational-grid button{display:flex;min-height:132px;flex-direction:column;align-items:flex-start;text-align:left;padding:17px;border:1px solid #dfe6e2;border-radius:13px;background:#fff;color:#24382f;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s}
+.admin-operational-grid button:hover{transform:translateY(-2px);border-color:#a8c2b4;box-shadow:var(--shadow-md)}
+.admin-operational-grid span{font-size:8px;letter-spacing:1.25px;color:#7d8c84;font-weight:800}
+.admin-operational-grid strong{font-size:24px;line-height:1.1;margin:8px 0 4px;color:var(--green)}
+.admin-operational-grid small{font-size:10px;color:var(--muted);line-height:1.4}
+.admin-operational-grid b{margin-top:auto;padding-top:10px;font-size:9px;color:#557565}
+@media(max-width:1050px){.admin-operational-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.admin-operational-grid{grid-template-columns:1fr}.admin-operational-grid button{min-height:112px}}
