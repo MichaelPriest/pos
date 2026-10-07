@@ -353,3 +353,4 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .shipping-quote-list .shop-primary{margin:0;white-space:nowrap}
 .logistics-settings{border-top:1px solid #e1e7e3;padding-top:24px}
 @media(max-width:650px){.shipping-quote-list article{grid-template-columns:1fr auto}.shipping-quote-list article .shop-primary{grid-column:1/-1;width:100%}}
+.shipping-live-note{margin:-4px 0 10px;color:var(--muted);font-size:11px;line-height:1.45}
