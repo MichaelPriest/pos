@@ -44,6 +44,6 @@ test('PDV pesquisa e adiciona peça pelo código de inventário',()=>{
 test('código de inventário tem fallback estável para peça legada',async()=>{
   const inventory=await readFile(new URL('../lib/inventory-code.js',import.meta.url),'utf8');
   assert.ok(inventory.includes("product.barcode||product.sku||''"));
-  assert.ok(inventory.includes("'RV-'"));
+  assert.ok(inventory.includes('RV-'));
   assert.ok(inventory.includes('slice(0,10)'));
 });
