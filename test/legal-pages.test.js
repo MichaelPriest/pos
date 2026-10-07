@@ -5,12 +5,13 @@ import test from 'node:test';
 const main=await readFile(new URL('../src/main.jsx',import.meta.url),'utf8');
 const legal=await readFile(new URL('../pages/legal.jsx',import.meta.url),'utf8');
 const store=await readFile(new URL('../pages/loja.jsx',import.meta.url),'utf8');
+const footer=await readFile(new URL('../components/CommerceFooter.jsx',import.meta.url),'utf8');
 const checkout=await readFile(new URL('../pages/checkout.jsx',import.meta.url),'utf8');
 
 test('loja publica políticas comerciais acessíveis pelo rodapé',()=>{
   for(const route of ['/privacidade','/termos','/trocas-e-devolucoes']){
     assert.match(main,new RegExp(`path="${route}"`));
-    assert.match(store,new RegExp(`href="${route}"`));
+    assert.match(footer,new RegExp(`href="${route}"`));
     assert.match(legal,new RegExp(`'${route}'`));
   }
 });
