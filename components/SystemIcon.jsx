@@ -34,6 +34,7 @@ export default function SystemIcon({name,size=18}){
       case 'shield': return <><path d="M12 3 20 6v5c0 5-3 8-8 10-5-2-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></>;
       case 'plug': return <><path d="M8 3v5M16 3v5M6 8h12v2a6 6 0 0 1-6 6v5M9 21h6"/></>;
       case 'external': return <><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v7H4V6h7"/></>;
+      case 'search': return <><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></>;
       case 'menu': return <><path d="M4 7h16M4 12h16M4 17h16"/></>;
       case 'close': return <path d="m6 6 12 12M18 6 6 18"/>;
       default: return <circle cx="12" cy="12" r="8"/>;
