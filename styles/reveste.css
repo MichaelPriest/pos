@@ -209,3 +209,35 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 
 /* Legal and commerce policies */
 .footer-legal{display:flex;flex-wrap:wrap;gap:12px}.footer-legal a{color:inherit;font-size:10px;text-decoration:underline}.checkout-consent{margin:20px 0!important;line-height:1.5}.checkout-consent a{color:var(--green);font-weight:800;text-decoration:underline}.legal-page{min-height:100vh;background:#f5f7f5;color:var(--ink)}.legal-page>header{height:72px;padding:0 clamp(20px,6vw,90px);display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid var(--line)}.legal-page>header>a:last-child{color:var(--green);font-size:12px;font-weight:700}.legal-page>article{width:min(760px,calc(100% - 40px));margin:55px auto;background:#fff;border:1px solid var(--line);padding:clamp(28px,6vw,60px)}.legal-page h1{font:700 clamp(38px,6vw,56px) 'Playfair Display';color:var(--green);margin:8px 0 12px}.legal-intro{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:35px}.legal-page article section{padding:20px 0;border-top:1px solid var(--line)}.legal-page article h2{font:700 21px 'Playfair Display';color:var(--green);margin:0 0 8px}.legal-page article section p{color:var(--muted);font-size:13px;line-height:1.75;margin:0}.legal-page article>small{display:block;color:var(--muted);margin-top:24px}.legal-page>footer{display:flex;justify-content:center;flex-wrap:wrap;gap:20px;padding:0 20px 50px}.legal-page>footer a{color:var(--green);font-size:11px;font-weight:700}@media(max-width:600px){.legal-page>article{margin:25px auto}.legal-page>header{height:64px}}
+
+
+/* ReVeste completion pass — unified shell and customer mobile navigation */
+.system-workspace .admin-shell{display:block;min-height:100dvh}
+.system-workspace .admin-side{display:none!important}
+.system-workspace .admin-main{width:100%;margin-left:0;padding:32px clamp(18px,3.5vw,54px)}
+.system-sidebar nav details{border-radius:10px}
+.system-sidebar nav details[open]{background:#ffffff08}
+.system-sidebar nav summary{display:flex;align-items:center;gap:10px;padding:9px 10px;color:#9fb1a8;cursor:pointer;list-style:none;font-size:10px;font-weight:800;letter-spacing:.55px;text-transform:uppercase}
+.system-sidebar nav summary::-webkit-details-marker{display:none}
+.system-sidebar nav summary i{width:20px;text-align:center;font-style:normal}
+.system-sidebar nav details>a{margin:2px 6px;padding:10px}
+.system-sidebar nav a:focus-visible,.system-sidebar summary:focus-visible,.system-mobile-shortcuts a:focus-visible,.system-mobile-shortcuts button:focus-visible,.customer-mobile-nav a:focus-visible{outline:3px solid #b6dbc8;outline-offset:2px}
+.customer-mobile-nav{display:none}
+.user-menu-notice{margin:7px 4px 2px;padding:8px 9px;border-radius:7px;background:#f2f6f3;color:#466454;font-size:9px;line-height:1.4}
+@media(max-width:900px) and (min-width:681px){
+  .system-sidebar nav summary{justify-content:center;padding:9px 4px}
+  .system-sidebar nav summary span{display:none}
+  .system-sidebar nav details>a{margin:2px 0}
+}
+@media(max-width:680px){
+  .system-workspace .admin-main{padding:20px 12px 90px}
+  .customer-mobile-nav{position:fixed;inset:auto 0 0;z-index:95;display:grid;grid-template-columns:repeat(5,1fr);height:calc(66px + env(safe-area-inset-bottom));padding:5px 6px env(safe-area-inset-bottom);border-top:1px solid #d9e2dc;background:#fffffff5;box-shadow:0 -8px 28px #1d30251c;backdrop-filter:blur(14px) saturate(150%)}
+  .customer-mobile-nav a{display:flex;min-width:0;align-items:center;justify-content:center;flex-direction:column;gap:3px;border-radius:10px;color:#69766f;font-size:9px;font-weight:800}
+  .customer-mobile-nav a svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .customer-mobile-nav a.active{background:#edf4f0;color:var(--green)}
+  .store-page,.product-page,.favorites-page,.notifications-page,.donation-page,.customer-account,.legal-page{padding-bottom:calc(66px + env(safe-area-inset-bottom))}
+  .store-footer{padding-bottom:calc(45px + 66px + env(safe-area-inset-bottom))}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
