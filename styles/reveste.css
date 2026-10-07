@@ -268,3 +268,30 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .return-actions button{padding:7px 9px;border:1px solid #b8c8be;border-radius:8px;background:#fff;color:var(--green);font-size:10px;font-weight:800;cursor:pointer}
 .return-actions button:hover{background:#edf4f0}
 @media(max-width:680px){.return-item-row{grid-template-columns:auto 1fr}.return-item-row>input[type=number]{grid-column:2}}
+
+/* Etiqueta individual da peça */
+.intake-label-link{display:inline-flex;align-items:center;padding:6px 9px;border:1px solid #b8c8be;border-radius:8px;background:#fff;color:var(--green);font-size:10px;font-weight:800;text-decoration:none}
+.intake-label-link:hover{background:#edf4f0}
+.piece-label-page{min-height:100vh;display:grid;place-items:center;align-content:center;gap:18px;padding:28px;background:#eef1ef}
+.piece-label-sheet{width:58mm;min-height:38mm;padding:4mm;border:1px solid #c9d0cc;border-radius:3mm;background:#fff;color:#18231d;box-shadow:0 10px 32px #1c2f241a}
+.piece-label-sheet header{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid #d7ded9;padding-bottom:2mm}
+.piece-label-sheet header strong{font-family:Georgia,'Times New Roman',serif;font-size:17px;letter-spacing:.08em}
+.piece-label-sheet header small{font-size:6px;font-weight:800;letter-spacing:.18em}
+.piece-label-sheet h1{margin:3mm 0 1.5mm;font-size:12px;line-height:1.15}
+.piece-label-meta{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:2mm}
+.piece-label-meta span{padding:2px 5px;border:1px solid #d9e0dc;border-radius:10px;font-size:6px;text-transform:uppercase}
+.piece-label-price{display:block;margin:1mm 0 2mm;font-size:17px}
+.barcode39{display:block;width:100%;height:14mm;fill:#000;shape-rendering:crispEdges}
+.piece-label-code{text-align:center;margin-top:1mm;font:700 7px/1.2 monospace;letter-spacing:.12em}
+.piece-label-sheet footer{display:flex;justify-content:space-between;margin-top:2mm;padding-top:1.5mm;border-top:1px solid #d7ded9;font-size:6px;font-weight:800;text-transform:uppercase}
+.piece-label-actions{display:flex;gap:8px}
+.piece-label-actions button{padding:10px 14px;border:1px solid #b8c8be;border-radius:9px;background:#fff;color:var(--green);font-weight:800;cursor:pointer}
+.piece-label-actions .shop-primary{background:var(--green);color:#fff}
+@media print{
+  body{background:#fff!important}
+  body>*:not(#root){display:none!important}
+  .piece-label-page{display:block;min-height:0;padding:0;background:#fff}
+  .piece-label-sheet{width:58mm;min-height:38mm;border:0;box-shadow:none;margin:0}
+  .no-print,.user-menu,.customer-mobile-nav,.system-mobile-shortcuts{display:none!important}
+  @page{size:58mm 40mm;margin:0}
+}
