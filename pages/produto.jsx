@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Head from '../src/shims/Head';
 import Link from '../src/shims/Link';
-import StoreBrand from '../components/StoreBrand';
+import CommerceHeader from '../components/CommerceHeader';
+import CommerceFooter from '../components/CommerceFooter';
 import { configured, db, getSession } from '../lib/supabase';
 
 const money = value => Number(value || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
@@ -20,11 +21,14 @@ export default function ProductDetail() {
     Promise.all([db.product(id),db.settings(),getSession()?db.isFavorite(id):false]).then(([item,store,saved]) => { setProduct(item);if(store)setSettings(store);setFavorite(Boolean(saved)); }).catch(error=>setMessage(error.message)).finally(()=>setLoading(false));
   },[id]);
 
-  const addToBag = () => {
+  const addToBag = goCheckout => {
     const bag = JSON.parse(localStorage.getItem('reveste_cart') || '[]');
-    if (bag.some(item=>item.id===product.id)) return setMessage('Esta peça já está na sua sacola.');
-    localStorage.setItem('reveste_cart',JSON.stringify([...bag,product]));
-    setMessage('Peça adicionada à sacola. Continue comprando ou vá para a loja finalizar.');
+    if (!bag.some(item=>item.id===product.id)) {
+      localStorage.setItem('reveste_cart',JSON.stringify([...bag,product]));
+      window.dispatchEvent(new CustomEvent('cart:updated'));
+    }
+    if(goCheckout){sessionStorage.setItem('reveste_checkout_key',crypto.randomUUID());location.href='/checkout';return}
+    setMessage(bag.some(item=>item.id===product.id)?'Esta peça já está na sua sacola.':'Peça adicionada à sacola.');
   };
   const toggleFavorite = async () => {
     if (!getSession()) { location.href=`/login?next=/produto/${id}`;return; }
@@ -35,10 +39,11 @@ export default function ProductDetail() {
   if (!product) return <main className="product-not-found"><span>◇</span><h1>Peça indisponível</h1><p>{message||'Esta peça já encontrou uma nova história ou não está mais publicada.'}</p><Link href="/loja">Voltar ao catálogo</Link></main>;
 
   return <><Head><title>{product.name} | {settings.store_name}</title><meta name="description" content={product.description||`${product.name}, tamanho ${product.size}, disponível em nosso brechó online.`}/></Head><main className="product-page" style={{'--green':settings.primary_color||'#315d4a'}}>
-    <header><Link href="/loja"><StoreBrand/></Link><Link href="/loja">← Voltar ao catálogo</Link></header>
+    <CommerceHeader/>
+    <nav className="commerce-breadcrumb" aria-label="Caminho"><Link href="/loja">Loja</Link><span>›</span><Link href="/loja#catalogo">{product.category}</Link><span>›</span><b>{product.name}</b></nav>
     <section className="product-detail">
       <div className="product-detail-image"><img src={product.image_url||'/placeholder.svg'} alt={product.name}/><span>PEÇA ÚNICA</span></div>
-      <article><p className="section-kicker">{product.category}</p><h1>{product.name}</h1><div className="product-price">{money(product.price)}</div><div className="product-specs"><span><small>TAMANHO</small><b>{product.size}</b></span><span><small>DISPONIBILIDADE</small><b>{product.stock>1?`${product.stock} unidades`:'Última unidade'}</b></span></div><p className="product-description">{product.description||'Peça selecionada pela nossa curadoria, revisada e pronta para viver uma nova história.'}</p>{message&&<div className="store-message">{message}</div>}<div className="product-actions"><button className="shop-primary" onClick={addToBag}>Adicionar à sacola</button><button className={favorite?'favorite-button saved':'favorite-button'} aria-label={favorite?'Remover dos favoritos':'Salvar nos favoritos'} onClick={toggleFavorite}>{favorite?'♥':'♡'}</button></div><Link className="product-checkout-link" href="/favoritos">Ver meus favoritos →</Link><ul><li>✓ Peça higienizada e revisada</li><li>✓ Pagamento processado em ambiente protegido</li><li>♻ Compra que prolonga a vida útil da moda</li></ul></article>
-    </section>
+      <article><p className="section-kicker">{product.category}</p><h1>{product.name}</h1>{product.brand&&<p className="product-brand">{product.brand}</p>}<div className="product-price">{money(product.price)}</div><div className="product-specs"><span><small>TAMANHO</small><b>{product.size}</b></span><span><small>ESTADO</small><b>{product.condition_grade||'Revisada'}</b></span>{product.color&&<span><small>COR</small><b>{product.color}</b></span>}<span><small>DISPONIBILIDADE</small><b>{product.stock>1?`${product.stock} unidades`:'Última unidade'}</b></span></div><p className="product-description">{product.description||'Peça selecionada pela nossa curadoria, revisada e pronta para viver uma nova história.'}</p>{message&&<div className="store-message">{message}</div>}<div className="product-actions product-actions-commerce"><button className="shop-primary" onClick={()=>addToBag(false)}>Adicionar à sacola</button><button className="buy-now-button" onClick={()=>addToBag(true)}>Comprar agora</button><button className={favorite?'favorite-button saved':'favorite-button'} aria-label={favorite?'Remover dos favoritos':'Salvar nos favoritos'} onClick={toggleFavorite}>{favorite?'♥':'♡'}</button></div><div className="product-service-grid"><span><b>Compra protegida</b><small>Pagamento processado com segurança</small></span><span><b>Envio rastreável</b><small>Acompanhe pela sua conta</small></span><span><b>Peça revisada</b><small>Curadoria antes da publicação</small></span></div><Link className="product-checkout-link" href="/favoritos">Ver meus favoritos →</Link></article>
+    </section><CommerceFooter/>
   </main></>;
 }
