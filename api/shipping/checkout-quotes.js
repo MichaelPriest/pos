@@ -88,6 +88,7 @@ export default async function handler(req,res){
     ]);
     if(!token)return res.status(409).json({message:'Frete ao vivo ainda não configurado.'});
     const settings=(settingsRes.ok?await settingsRes.json():[])[0]||{};
+    if(settings.melhorenvio_sandbox!==false)return res.status(409).json({message:'Frete ao vivo em homologação. Usando a tabela de frete da loja.'});
     const origin=digits(settings.shipping_origin_zip_code);
     if(origin.length!==8)return res.status(409).json({message:'CEP de origem ainda não configurado.'});
     const volume={width:Number(settings.shipping_package_width),height:Number(settings.shipping_package_height),length:Number(settings.shipping_package_length),weight:Number(settings.shipping_package_weight)};
