@@ -342,3 +342,14 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .profitability-summary p:last-child{border-bottom:0}
 @media(max-width:1050px){.profitability-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.profitability-filters .shop-primary{grid-column:1/-1}.profitability-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.profitability-grid{grid-template-columns:1fr}}
 @media(max-width:650px){.profitability-filters,.profitability-kpis{grid-template-columns:1fr}.profit-source{grid-template-columns:1fr 1fr}.profit-source>div{grid-column:1/-1}}
+
+/* Melhor Envio */
+.shipping-quote-modal{width:min(720px,calc(100vw - 28px));max-height:min(82vh,760px);overflow:auto}
+.shipping-quote-list{display:grid;gap:10px;margin-top:14px}
+.shipping-quote-list article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:13px;border:1px solid #dce4df;border-radius:12px;background:#fff}
+.shipping-quote-list article>div{display:flex;flex-direction:column;gap:2px}
+.shipping-quote-list article span,.shipping-quote-list article small{color:var(--muted);font-size:11px}
+.shipping-quote-list article strong{font-size:16px;color:var(--green);white-space:nowrap}
+.shipping-quote-list .shop-primary{margin:0;white-space:nowrap}
+.logistics-settings{border-top:1px solid #e1e7e3;padding-top:24px}
+@media(max-width:650px){.shipping-quote-list article{grid-template-columns:1fr auto}.shipping-quote-list article .shop-primary{grid-column:1/-1;width:100%}}
