@@ -18,17 +18,22 @@ test('modela entrada, consignante, peça e repasse',()=>{
   assert.match(migration,/store_commission_percent numeric\(5,2\)/i);
 });
 
-test('aprovação cria produto e preserva origem da peça',()=>{
+test('aprovação cria produto sem expor dados internos de aquisição no catálogo público',()=>{
   assert.match(migration,/create or replace function public\.approve_intake_item\(p_item_id uuid\)/i);
-  assert.match(migration,/insert into public\.products/i);
-  assert.match(migration,/acquisition_type,acquisition_cost,consignor_id,intake_item_id/i);
+  assert.match(migration,/insert into public\.products\(name,description,category,size,price,stock,image_url,active,sku,brand,color,condition_grade\)/i);
   assert.match(migration,/set product_id=new_product_id,status='listed'/i);
   assert.match(migration,/revoke all on function public\.approve_intake_item\(uuid\) from public,anon/i);
+  assert.doesNotMatch(migration,/alter table public\.products add column if not exists acquisition_cost/i);
+  assert.doesNotMatch(migration,/alter table public\.products add column if not exists consignor_id/i);
+  assert.doesNotMatch(migration,/alter table public\.products add column if not exists intake_item_id/i);
+  assert.doesNotMatch(migration,/alter table public\.products add column if not exists acquisition_type/i);
 });
 
-test('venda consignada gera repasse e baixa integra financeiro',()=>{
+test('venda consignada gera repasse tanto online quanto no PDV',()=>{
   assert.match(migration,/create or replace function public\.create_consignment_settlements\(\)/i);
   assert.match(migration,/after insert or update of status on public\.orders/i);
+  assert.match(migration,/create or replace function public\.create_consignment_settlement_for_order_item\(\)/i);
+  assert.match(migration,/after insert on public\.order_items/i);
   assert.match(migration,/on conflict\(order_item_id\) do nothing/i);
   assert.match(migration,/create or replace function public\.pay_consignment_settlement/i);
   assert.match(migration,/insert into public\.financial_entries/i);
