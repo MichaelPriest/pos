@@ -37,5 +37,13 @@ como não aplicadas e poderia tentar recriar objetos que já existem.
 
 ## Produção
 
-As migrations 028+ adicionadas pela auditoria permanecem **somente no Git**
-até a adoção segura do baseline e a validação de uma janela de aplicação.
+Em 07/10/2026, após validação transacional com `BEGIN/ROLLBACK`, foram
+aplicadas diretamente ao projeto Supabase real as migrations `026` a `035`
+necessárias para alinhar o banco ao código atual. Elas **continuam sem registro**
+em `supabase_migrations.schema_migrations`, porque o projeto remoto não possui
+histórico de migrations inicializado.
+
+Portanto, o banco já contém essas alterações, mas a regra permanece: **não usar
+`supabase db push` ainda**. A adoção do baseline deve primeiro reconciliar o
+estado remoto completo (001–035) com o Git e só então registrar o histórico como
+aplicado.
