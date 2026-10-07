@@ -17,3 +17,11 @@ test('credenciais permanecem protegidas e nunca são renderizadas',()=>{
   assert.match(hub,/type="password"/);
   assert.match(hub,/criptografadas no servidor/);
 });
+
+
+test('não confunde credencial salva com conector operacional',()=>{
+  assert.match(hub,/operationalProviders/);
+  assert.match(hub,/Conector disponível/);
+  assert.match(hub,/Conector pendente/);
+  assert.match(hub,/Ainda não há sincronização automática/);
+});
