@@ -16,7 +16,7 @@ const system=await readFile(new URL('../src/components/SystemLayout.jsx',import.
 test('chrome de ecommerce é compartilhado nas principais jornadas do cliente',()=>{
   for(const source of [store,product,favorites,account,notifications,donation,legal]) assert.ok(source.includes('CommerceHeader'));
   for(const source of [store,product,favorites,account,notifications,donation,legal]) assert.ok(source.includes('CommerceFooter'));
-  assert.ok(header.includes("placeholder="Buscar peças, marcas...""));
+  assert.ok(header.includes('placeholder="Buscar peças, marcas..."'));
   assert.ok(header.includes("cart:updated"));
   assert.ok(footer.includes('/trocas-e-devolucoes'));
 });
