@@ -942,7 +942,7 @@ alter policy "cliente ve rastreio" on public.tracking_events using (exists (sele
 
 -- AUDIT-INTAKE-CONSIGNMENT-2026-10
 -- Fluxo operacional de entrada, avaliação e consignação de peças.
--- Mantém peças fora do catálogo até aprovação explícita e gera repasse ao consignante após venda paga.
+-- Dados comerciais sensíveis permanecem nas tabelas de entrada; products recebe apenas campos seguros para catálogo.
 
 create table if not exists public.consignors(
   id uuid primary key default gen_random_uuid(),
@@ -992,20 +992,15 @@ create table if not exists public.inventory_intake_items(
   updated_at timestamptz not null default now()
 );
 
+-- Somente atributos seguros para o catálogo público ficam em products.
 alter table public.products add column if not exists sku text;
 alter table public.products add column if not exists barcode text;
 alter table public.products add column if not exists brand text;
 alter table public.products add column if not exists color text;
 alter table public.products add column if not exists condition_grade text;
-alter table public.products add column if not exists acquisition_type text;
-alter table public.products add column if not exists acquisition_cost numeric(10,2) not null default 0;
-alter table public.products add column if not exists consignor_id uuid references public.consignors(id) on delete set null;
-alter table public.products add column if not exists intake_item_id uuid references public.inventory_intake_items(id) on delete set null;
 
 create unique index if not exists products_sku_unique_idx on public.products(sku) where sku is not null;
 create unique index if not exists products_barcode_unique_idx on public.products(barcode) where barcode is not null;
-create index if not exists products_consignor_id_idx on public.products(consignor_id);
-create index if not exists products_intake_item_id_idx on public.products(intake_item_id);
 create index if not exists inventory_intakes_consignor_id_idx on public.inventory_intakes(consignor_id);
 create index if not exists inventory_intakes_created_by_idx on public.inventory_intakes(created_by);
 create index if not exists inventory_intake_items_intake_id_idx on public.inventory_intake_items(intake_id);
@@ -1095,26 +1090,15 @@ begin
   end if;
 
   generated_sku:='RV-'||upper(substr(replace(item.id::text,'-',''),1,10));
-  if jsonb_typeof(item.images)='array' and jsonb_array_length(item.images)>0 then
-    first_image:=nullif(item.images->>0,'');
-  end if;
+  if jsonb_typeof(item.images)='array' and jsonb_array_length(item.images)>0 then first_image:=nullif(item.images->>0,''); end if;
 
-  insert into public.products(
-    name,description,category,size,price,stock,image_url,active,
-    sku,brand,color,condition_grade,acquisition_type,acquisition_cost,consignor_id,intake_item_id
-  ) values(
-    item.name,item.description,item.category,item.size,item.sale_price,1,first_image,true,
-    generated_sku,item.brand,item.color,item.condition_grade,intake.source_type,item.acquisition_cost,intake.consignor_id,item.id
-  ) returning id into new_product_id;
+  insert into public.products(name,description,category,size,price,stock,image_url,active,sku,brand,color,condition_grade)
+  values(item.name,item.description,item.category,item.size,item.sale_price,1,first_image,true,generated_sku,item.brand,item.color,item.condition_grade)
+  returning id into new_product_id;
 
-  update public.inventory_intake_items
-     set product_id=new_product_id,status='listed',updated_at=now()
-   where id=item.id;
+  update public.inventory_intake_items set product_id=new_product_id,status='listed',updated_at=now() where id=item.id;
 
-  if not exists(
-    select 1 from public.inventory_intake_items
-    where intake_id=intake.id and status='pending'
-  ) then
+  if not exists(select 1 from public.inventory_intake_items where intake_id=intake.id and status='pending') then
     update public.inventory_intakes set status='approved',updated_at=now() where id=intake.id;
   end if;
 
@@ -1125,6 +1109,7 @@ $$;
 revoke all on function public.approve_intake_item(uuid) from public,anon;
 grant execute on function public.approve_intake_item(uuid) to authenticated,service_role;
 
+-- Online: os itens já existem quando o status muda para pago.
 create or replace function public.create_consignment_settlements()
 returns trigger
 language plpgsql
@@ -1140,11 +1125,7 @@ begin
     gross_amount,commission_percent,store_commission_amount,payout_amount,available_at
   )
   select
-    p.consignor_id,
-    i.id,
-    p.id,
-    new.id,
-    oi.id,
+    intake.consignor_id,i.id,p.id,new.id,oi.id,
     round(oi.unit_price*oi.quantity,2),
     i.store_commission_percent,
     round((oi.unit_price*oi.quantity)*(i.store_commission_percent/100),2),
@@ -1152,21 +1133,15 @@ begin
     now()+make_interval(days=>coalesce(c.payout_days,7))
   from public.order_items oi
   join public.products p on p.id=oi.product_id
-  join public.inventory_intake_items i on i.id=p.intake_item_id
-  join public.consignors c on c.id=p.consignor_id
+  join public.inventory_intake_items i on i.product_id=p.id
+  join public.inventory_intakes intake on intake.id=i.intake_id and intake.source_type='consignment'
+  join public.consignors c on c.id=intake.consignor_id
   where oi.order_id=new.id
-    and p.acquisition_type='consignment'
-    and p.consignor_id is not null
   on conflict(order_item_id) do nothing;
 
-  update public.inventory_intake_items i
-     set status='sold',updated_at=now()
-   where i.product_id in(
-     select oi.product_id from public.order_items oi where oi.order_id=new.id
-   ) and exists(
-     select 1 from public.products p
-     where p.id=i.product_id and p.acquisition_type='consignment'
-   );
+  update public.inventory_intake_items i set status='sold',updated_at=now()
+   where i.product_id in(select oi.product_id from public.order_items oi where oi.order_id=new.id)
+     and exists(select 1 from public.inventory_intakes intake where intake.id=i.intake_id and intake.source_type='consignment');
 
   return new;
 end;
@@ -1179,6 +1154,52 @@ for each row execute function public.create_consignment_settlements();
 
 revoke execute on function public.create_consignment_settlements() from public,anon,authenticated;
 
+-- PDV: o pedido nasce pago antes dos order_items; por isso cada item inserido precisa reconciliar o repasse.
+create or replace function public.create_consignment_settlement_for_order_item()
+returns trigger
+language plpgsql
+security definer
+set search_path=public
+as $$
+declare
+  target_order public.orders%rowtype;
+begin
+  select * into target_order from public.orders where id=new.order_id;
+  if target_order.id is null or target_order.status<>'pago' then return new; end if;
+
+  insert into public.consignment_settlements(
+    consignor_id,intake_item_id,product_id,order_id,order_item_id,
+    gross_amount,commission_percent,store_commission_amount,payout_amount,available_at
+  )
+  select
+    intake.consignor_id,i.id,p.id,new.order_id,new.id,
+    round(new.unit_price*new.quantity,2),
+    i.store_commission_percent,
+    round((new.unit_price*new.quantity)*(i.store_commission_percent/100),2),
+    round((new.unit_price*new.quantity)*(1-(i.store_commission_percent/100)),2),
+    now()+make_interval(days=>coalesce(c.payout_days,7))
+  from public.products p
+  join public.inventory_intake_items i on i.product_id=p.id
+  join public.inventory_intakes intake on intake.id=i.intake_id and intake.source_type='consignment'
+  join public.consignors c on c.id=intake.consignor_id
+  where p.id=new.product_id
+  on conflict(order_item_id) do nothing;
+
+  update public.inventory_intake_items i set status='sold',updated_at=now()
+   where i.product_id=new.product_id
+     and exists(select 1 from public.inventory_intakes intake where intake.id=i.intake_id and intake.source_type='consignment');
+
+  return new;
+end;
+$$;
+
+drop trigger if exists create_consignment_settlement_on_order_item on public.order_items;
+create trigger create_consignment_settlement_on_order_item
+after insert on public.order_items
+for each row execute function public.create_consignment_settlement_for_order_item();
+
+revoke execute on function public.create_consignment_settlement_for_order_item() from public,anon,authenticated;
+
 create or replace function public.pay_consignment_settlement(p_settlement_id uuid,p_payment_reference text default null)
 returns uuid
 language plpgsql
@@ -1190,9 +1211,7 @@ declare
   owner_name text;
   entry_id uuid;
 begin
-  if not has_system_role(array['admin','manager']) then
-    raise exception 'Conta sem permissão para registrar repasses';
-  end if;
+  if not has_system_role(array['admin','manager']) then raise exception 'Conta sem permissão para registrar repasses'; end if;
 
   select * into settlement from public.consignment_settlements where id=p_settlement_id for update;
   if settlement.id is null then raise exception 'Repasse não encontrado'; end if;
@@ -1203,11 +1222,8 @@ begin
   select name into owner_name from public.consignors where id=settlement.consignor_id;
 
   insert into public.financial_entries(type,category,description,amount,due_date,paid_at,status)
-  values(
-    'expense','Repasse de consignação',
-    'Repasse para '||coalesce(owner_name,'consignante'),
-    settlement.payout_amount,current_date,now(),'paid'
-  ) returning id into entry_id;
+  values('expense','Repasse de consignação','Repasse para '||coalesce(owner_name,'consignante'),settlement.payout_amount,current_date,now(),'paid')
+  returning id into entry_id;
 
   update public.consignment_settlements
      set status='paid',paid_at=now(),payment_reference=nullif(trim(coalesce(p_payment_reference,'')),''),
@@ -1375,6 +1391,26 @@ begin
   select * into target from public.order_returns where id=p_return_id for update;
   if target.id is null then raise exception 'Devolução não encontrada'; end if;
   if target.status not in('approved','requested') then return target.id; end if;
+
+  -- Uma venda consignada devolvida não pode manter repasse financeiro em aberto.
+  -- Se o repasse já saiu, a equipe precisa regularizar antes de receber a peça para
+  -- evitar devolver estoque e manter um pagamento irreversivelmente marcado como quitado.
+  if exists(
+    select 1
+      from public.order_return_items ri
+      join public.consignment_settlements cs on cs.order_item_id=ri.order_item_id
+     where ri.return_id=target.id
+       and cs.status='paid'
+  ) then
+    raise exception 'Há repasse de consignação já pago nesta devolução. Regularize o repasse antes de receber a peça';
+  end if;
+
+  update public.consignment_settlements cs
+     set status='cancelled'
+    from public.order_return_items ri
+   where ri.return_id=target.id
+     and ri.order_item_id=cs.order_item_id
+     and cs.status='pending';
 
   for item in select * from public.order_return_items where return_id=target.id and status='pending' for update
   loop
