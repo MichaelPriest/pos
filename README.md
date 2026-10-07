@@ -44,8 +44,14 @@ Sistema real de loja online para brechó, com autenticação, catálogo, carrinh
 - Área do cliente isolada da equipe, com pedidos, rastreamento, endereços, doações e dados pessoais.
 - Checkout idempotente contra pedidos duplicados, inclusive em duplo clique ou nova tentativa.
 - Pedidos separados por status, com datatable pesquisável e paginada.
-- Módulos administrativos dedicados para estoque, logística e campanhas de cupons.\n- Entrada e avaliação de peças por compra própria, consignação ou doação, com SKU, origem e rastreabilidade até a venda.\n- Consignação com cálculo automático de comissão/repasse e baixa integrada ao financeiro.
-- Código de inventário por peça com fallback para itens legados, etiqueta Code 39 imprimível e leitura por SKU/código no PDV.\n- Trocas e devoluções operacionais com recebimento físico, retorno opcional ao estoque e confirmação manual do reembolso externo.
+- Módulos administrativos dedicados para estoque, logística e campanhas de cupons.
+- Entrada e avaliação de peças por compra própria, consignação ou doação, com SKU, origem e rastreabilidade até a venda.
+- Consignação com cálculo automático de comissão/repasse e baixa integrada ao financeiro.
+- Código de inventário por peça com fallback para itens legados, etiqueta Code 39 imprimível e leitura por SKU/código no PDV.
+- Trocas e devoluções operacionais com recebimento físico, retorno opcional ao estoque, estorno automático Stripe e fallback manual para outros meios.
+- Melhor Envio integrado no backoffice: cotação, carrinho, compra com confirmação explícita, geração, impressão, atualização de rastreio e despacho.
+- Checkout com cotação temporária server-side do Melhor Envio, vinculada a cliente/CEP/sacola/cupom e consumida uma única vez; frete fixo permanece como fallback.
+- Configuração de remetente, pacote e documento fiscal armazenada fora da tabela pública da loja, acessível somente por API administrativa/service role.
 
 ## 1. Criar o banco
 
@@ -137,7 +143,7 @@ A migração `025_checkout_key_type.sql` corrige a comparação de `checkout_key
 
 ### Precificação segura do checkout
 
-A migração `026_server_checkout_pricing.sql` calcula o frete no banco, valida os meios habilitados e impede que valores enviados pelo navegador alterem o total do pedido. Os preços do frete padrão e expresso são configuráveis no painel.
+A migração `026_server_checkout_pricing.sql` iniciou a precificação server-side do checkout. As migrations `040_melhor_envio_logistics.sql` e `041_server_shipping_quotes.sql` adicionam a integração logística e fazem o banco validar a cotação temporária pelo cliente, CEP, subtotal, desconto e cupom antes de aceitar o frete. Em Sandbox, o checkout continua usando a tabela fixa; cotações reais ao cliente só são liberadas em Produção. A migration `042_private_shipping_settings.sql` move CNPJ/IE/endereço do remetente e dados de pacote para configuração privada service-only.
 
 ### Navegação global e RH
 
