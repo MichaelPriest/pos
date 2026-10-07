@@ -493,3 +493,55 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .donation-page form{border-radius:16px!important;box-shadow:0 12px 36px rgba(38,66,53,.08)}
 @media(max-width:900px){.favorites-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.account-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.donation-page>section{grid-template-columns:1fr!important}.donation-page>section>aside{position:static}.product-service-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.product-page .product-detail{padding-top:16px}.product-actions-commerce{grid-template-columns:1fr auto}.product-actions-commerce .buy-now-button{grid-column:1/-1;grid-row:2}.product-specs{grid-template-columns:1fr 1fr}.favorites-grid{grid-template-columns:1fr!important}.account-overview{grid-template-columns:1fr 1fr;padding:0 14px 16px}.favorites-heading,.favorites-content,.notifications-shell,.customer-heading,.account-body,.account-tabs{padding-left:14px!important;padding-right:14px!important}}
+
+/* Unified backoffice refinement */
+.system-layout{background:#eef3f0}
+.system-sidebar{background:linear-gradient(180deg,#18382d 0%,#102b22 100%);border-right:1px solid #315144;box-shadow:12px 0 34px rgba(16,43,34,.09)}
+.system-sidebar .brand{padding-bottom:18px}
+.system-sidebar>p{margin:0 8px 12px;color:#789489}
+.system-sidebar nav{gap:5px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#456558 transparent}
+.system-sidebar nav details{border:1px solid transparent;border-radius:11px;padding:3px}
+.system-sidebar nav details[open]{border-color:#ffffff0b;background:#ffffff08}
+.system-sidebar nav summary{border-radius:8px}
+.system-sidebar nav details>a{border:1px solid transparent}
+.system-sidebar nav details>a:hover{transform:none;border-color:#ffffff0a;background:#ffffff0a}
+.system-sidebar nav a.active{background:#f4f8f6!important;color:#17392d!important;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.system-sidebar-bottom{margin-top:12px;padding-top:12px}
+.system-workspace{background:linear-gradient(145deg,#f5f8f6,#eef3f0);min-width:0}
+.system-topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:20px;height:66px;padding:0 clamp(18px,3.2vw,48px);border-bottom:1px solid #dce5df;background:rgba(250,252,251,.94);backdrop-filter:blur(18px) saturate(140%)}
+.system-topbar>div{display:flex;min-width:0;flex-direction:column;gap:2px}
+.system-topbar small{font-size:8px;font-weight:850;letter-spacing:.12em;color:#87978f}
+.system-topbar strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#233c31;font-size:14px}
+.system-topbar nav{display:flex;align-items:center;gap:7px}
+.system-topbar nav a{display:flex;align-items:center;gap:7px;height:36px;padding:0 11px;border:1px solid #d8e2dc;border-radius:9px;background:#fff;color:#38594a;text-decoration:none;font-size:9px;font-weight:800;box-shadow:0 2px 8px rgba(29,55,43,.035)}
+.system-topbar nav a:hover{border-color:#aac1b5;background:#f5f9f7}
+.system-topbar nav svg{width:16px;height:16px}
+.system-page-frame{min-width:0}
+.system-page-frame>.admin-shell,.system-page-frame>.ops-page,.system-page-frame>.cash-page,.system-page-frame>.reports-page,.system-page-frame>.profitability-page,.system-page-frame>.employee-detail-page,.system-page-frame>.staff-profile{max-width:1540px;margin-left:auto!important;margin-right:auto!important}
+.system-page-frame .admin-main{padding-top:28px!important}
+.ops-page,.cash-page,.reports-page,.profitability-page,.employee-detail-page,.staff-profile{padding:28px clamp(16px,3.2vw,46px) 48px!important}
+.ops-head,.reports-page>header,.cash-page>header,.employee-detail-page>header{align-items:flex-end!important;margin-bottom:22px!important}
+.ops-head h1,.admin-main h1,.reports-page h1,.cash-page h1{letter-spacing:-.035em;color:#203a2f}
+.ops-head span,.admin-main>header p,.reports-page>header span,.cash-page>header span{color:#718078;line-height:1.45}
+.ops-card,.admin-table,.admin-stats article,.report-kpis article,.cash-kpis article,.revenue-chart,.stock-watch,.settings-editor>section,.report-grid>article,.profitability-grid>article{border:1px solid #dfe6e2!important;border-radius:14px!important;background:#fff!important;box-shadow:0 6px 22px rgba(31,59,46,.045)!important}
+.ops-card,.admin-table{padding:20px!important}
+.ops-kpis,.admin-stats,.report-kpis,.cash-kpis{gap:11px!important}
+.ops-kpis article,.admin-stats article,.report-kpis article,.cash-kpis article{min-height:104px;padding:17px!important}
+.ops-kpis article small,.admin-stats article small,.report-kpis article small,.cash-kpis article small{font-size:8px!important;font-weight:850;letter-spacing:.075em;text-transform:uppercase;color:#829189}
+.ops-kpis article strong,.admin-stats article strong,.report-kpis article strong,.cash-kpis article strong{font-size:clamp(20px,2vw,27px)!important;color:#244a38}
+.table-scroll{border:1px solid #e6ebe8;border-radius:11px;background:#fff}
+.admin-table table,.ops-table table{border-collapse:separate!important;border-spacing:0!important}
+.admin-table th,.ops-table th{position:sticky;top:0;z-index:2;padding:11px 12px!important;border-bottom:1px solid #dde5e0!important;background:#f6f9f7!important;color:#63736b!important;font-size:8px!important;font-weight:850!important;letter-spacing:.07em}
+.admin-table td,.ops-table td{padding:13px 12px!important;border-bottom:1px solid #edf1ee!important;vertical-align:middle}
+.admin-table tbody tr:hover td,.ops-table tbody tr:hover td{background:#fbfdfc}
+.admin-table tbody tr:last-child td,.ops-table tbody tr:last-child td{border-bottom:0!important}
+.ops-card input,.ops-card select,.ops-card textarea,.people-filters input,.people-filters select,.finance-filters input,.finance-filters select,.settings-editor input,.settings-editor select,.settings-editor textarea{border:1px solid #d8e1dc!important;border-radius:9px!important;background:#fff!important;min-height:40px;padding:9px 11px!important;outline:none;transition:border-color .18s,box-shadow .18s}
+.ops-card input:focus,.ops-card select:focus,.ops-card textarea:focus,.people-filters input:focus,.people-filters select:focus,.finance-filters input:focus,.finance-filters select:focus,.settings-editor input:focus,.settings-editor select:focus,.settings-editor textarea:focus{border-color:#7fa28f!important;box-shadow:0 0 0 3px rgba(76,125,101,.11)}
+.ops-head button,.track-button,.admin-main button,.reports-page>header button{border-radius:9px!important;transition:transform .15s,box-shadow .15s,border-color .15s}
+.ops-head button:hover,.track-button:hover,.reports-page>header button:hover{transform:translateY(-1px);box-shadow:0 5px 15px rgba(38,69,54,.07)}
+.admin-notice,.account-notice,.form-message{border-radius:10px!important}
+.user-popover a,.user-popover label,.user-popover>button{display:flex!important;align-items:center;gap:9px}
+.user-popover svg{width:17px;height:17px;flex:0 0 auto}
+@media(min-width:901px){.system-layout{grid-template-columns:236px minmax(0,1fr)}}
+@media(max-width:900px) and (min-width:681px){.system-topbar{padding:0 16px}.system-topbar nav a span{display:none}.system-topbar nav a{width:36px;padding:0;justify-content:center}}
+@media(max-width:680px){.system-topbar{position:relative;height:58px;padding:0 12px}.system-topbar nav{gap:4px}.system-topbar nav a{width:34px;height:34px;padding:0;justify-content:center}.system-topbar nav a span{display:none}.ops-page,.cash-page,.reports-page,.profitability-page,.employee-detail-page,.staff-profile{padding:18px 12px 90px!important}.system-page-frame .admin-main{padding:18px 12px 90px!important}.ops-card,.admin-table{padding:14px!important}}
