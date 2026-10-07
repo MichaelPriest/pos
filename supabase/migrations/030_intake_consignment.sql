@@ -132,7 +132,7 @@ as $$
 declare
   item public.inventory_intake_items%rowtype;
   intake public.inventory_intakes%rowtype;
-  product_id uuid;
+  new_product_id uuid;
   generated_sku text;
   first_image text;
 begin
@@ -162,10 +162,10 @@ begin
   ) values(
     item.name,item.description,item.category,item.size,item.sale_price,1,first_image,true,
     generated_sku,item.brand,item.color,item.condition_grade,intake.source_type,item.acquisition_cost,intake.consignor_id,item.id
-  ) returning id into product_id;
+  ) returning id into new_product_id;
 
   update public.inventory_intake_items
-     set product_id=product_id,status='listed',updated_at=now()
+     set product_id=new_product_id,status='listed',updated_at=now()
    where id=item.id;
 
   if not exists(
@@ -175,7 +175,7 @@ begin
     update public.inventory_intakes set status='approved',updated_at=now() where id=intake.id;
   end if;
 
-  return product_id;
+  return new_product_id;
 end;
 $$;
 
