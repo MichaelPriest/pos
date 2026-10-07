@@ -7,6 +7,7 @@ const page=await readFile(new URL('../pages/etiqueta-peca/[id].jsx',import.meta.
 const main=await readFile(new URL('../src/main.jsx',import.meta.url),'utf8');
 const intake=await readFile(new URL('../pages/entradas.jsx',import.meta.url),'utf8');
 const db=await readFile(new URL('../lib/supabase.js',import.meta.url),'utf8');
+const pdv=await readFile(new URL('../pages/pdv.jsx',import.meta.url),'utf8');
 
 test('barcode Code 39 possui tabela, start stop e normalização',()=>{
   assert.ok(barcode.includes("'*':'nwnnwnwnn'"));
@@ -28,4 +29,13 @@ test('rota e ação de impressão ficam ligadas ao fluxo de entradas',()=>{
   assert.ok(intake.includes('/etiqueta-peca/'));
   assert.ok(intake.includes('item.product_id'));
   assert.ok(intake.includes('Imprimir etiqueta'));
+});
+
+
+test('PDV pesquisa e adiciona peça por SKU ou barcode',()=>{
+  assert.ok(pdv.includes('[p.name,p.category,p.brand,p.sku,p.barcode]'));
+  assert.ok(pdv.includes("String(p.barcode||'').toUpperCase()===code"));
+  assert.ok(pdv.includes("String(p.sku||'').toUpperCase()===code"));
+  assert.ok(pdv.includes("if(match){e.preventDefault();add(match);setQuery('');setCategory('Todos')}"));
+  assert.ok(pdv.includes('Nome, SKU ou código de barras...'));
 });
