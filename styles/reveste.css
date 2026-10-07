@@ -545,3 +545,63 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 @media(min-width:901px){.system-layout{grid-template-columns:236px minmax(0,1fr)}}
 @media(max-width:900px) and (min-width:681px){.system-topbar{padding:0 16px}.system-topbar nav a span{display:none}.system-topbar nav a{width:36px;padding:0;justify-content:center}}
 @media(max-width:680px){.system-topbar{position:relative;height:58px;padding:0 12px}.system-topbar nav{gap:4px}.system-topbar nav a{width:34px;height:34px;padding:0;justify-content:center}.system-topbar nav a span{display:none}.ops-page,.cash-page,.reports-page,.profitability-page,.employee-detail-page,.staff-profile{padding:18px 12px 90px!important}.system-page-frame .admin-main{padding:18px 12px 90px!important}.ops-card,.admin-table{padding:14px!important}}
+
+/* Checkout, auth, legal and route-state refinement */
+.checkout-page{background:#f4f7f5}
+.checkout-secure-header{display:grid!important;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;min-height:72px;padding:10px clamp(16px,5vw,72px)!important;border-bottom:1px solid #dfe6e2;background:#fff}
+.checkout-secure-header>a:first-child{justify-self:start;text-decoration:none;color:inherit}
+.checkout-security{display:flex;align-items:center;gap:9px;color:#315d4a}
+.checkout-security span{display:flex;align-items:center;gap:6px}
+.checkout-security svg{width:17px;height:17px}
+.checkout-security b{font-size:10px}
+.checkout-security small{color:#819088;font-size:8px}
+.checkout-back{justify-self:end;color:#557465;font-size:9px;font-weight:800;text-decoration:none}
+.checkout-progress{max-width:720px;margin:22px auto 28px!important}
+.checkout-progress span{font-size:10px}
+.checkout-progress span>b{font-weight:800}
+.checkout-page>section{max-width:1280px!important;margin-left:auto!important;margin-right:auto!important}
+.checkout-page>section{display:grid!important;grid-template-columns:minmax(0,1fr) 360px!important;gap:28px!important;align-items:start}
+.checkout-content{min-width:0}
+.checkout-content>form,.checkout-content>div{border:1px solid #e0e6e2;border-radius:16px;background:#fff;padding:26px;box-shadow:0 8px 28px rgba(31,58,45,.055)}
+.checkout-title{padding-bottom:15px;margin-bottom:19px;border-bottom:1px solid #edf1ef}
+.checkout-title h1{letter-spacing:-.03em}
+.checkout-content h2{margin:22px 0 10px;font-size:12px;color:#2e4a3d}
+.checkout-content input,.checkout-content select{border-radius:9px!important;border-color:#d8e1dc!important;min-height:42px!important}
+.shipping-choices{gap:9px!important}
+.shipping-choices label,.checkout-payment label{border-radius:11px!important;border-color:#dfe6e2!important;background:#fff!important;transition:border-color .18s,box-shadow .18s,transform .18s}
+.shipping-choices label:hover,.checkout-payment label:hover{border-color:#a8c0b4!important;transform:translateY(-1px)}
+.shipping-choices label.active,.checkout-payment label.active{border-color:#638d77!important;background:#f4f9f6!important;box-shadow:0 0 0 3px rgba(73,121,96,.08)}
+.checkout-next{min-height:46px;border-radius:10px!important;font-weight:850!important}
+.checkout-summary{position:sticky;top:86px;border:1px solid #dfe6e2!important;border-radius:16px!important;background:#fff!important;padding:20px!important;box-shadow:0 12px 34px rgba(31,58,45,.07)!important}
+.checkout-summary h2{font-size:15px!important}
+.checkout-summary article{padding:11px 0!important}
+.checkout-summary article img{border-radius:9px!important}
+.checkout-coupon{padding:13px!important;border-radius:10px!important;background:#f6f9f7!important}
+.summary-total{padding-top:14px!important;border-top:1px solid #dfe6e2!important}
+.summary-total b{font-size:19px!important;color:#28513d!important}
+.auth-page{background:#f4f7f5}
+.auth-art{background:linear-gradient(145deg,#17392d,#2f5c49)!important}
+.auth-art:after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 25%,rgba(255,255,255,.09),transparent 34%),radial-gradient(circle at 82% 74%,rgba(208,171,126,.12),transparent 30%);pointer-events:none}
+.auth-art>*{position:relative;z-index:1}
+.auth-art h1{letter-spacing:-.035em}
+.auth-commerce-benefits{display:grid;gap:8px;margin-top:28px}
+.auth-commerce-benefits span{display:flex;flex-direction:column;gap:2px;padding:11px 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:rgba(255,255,255,.05)}
+.auth-commerce-benefits b{font-size:10px;color:#fff}
+.auth-commerce-benefits small{font-size:8px;color:#c6d5cd}
+.auth-form-wrap{background:linear-gradient(180deg,#fff,#fbfcfb)}
+.auth-form{width:min(410px,100%)!important}
+.auth-form input{min-height:44px;border-radius:9px!important}
+.auth-form .shop-primary{min-height:45px;border-radius:10px!important}
+.auth-action-page{background:radial-gradient(circle at 50% 0,#eef5f1,#f7f8f6 56%,#fff)}
+.auth-action-page>section{border:1px solid #dfe6e2!important;border-radius:18px!important;background:#fff!important;box-shadow:0 18px 50px rgba(31,58,45,.08)!important}
+.legal-page{background:#f7f9f8!important}
+.legal-page>article{max-width:880px!important;margin:36px auto 0!important;padding:38px clamp(20px,5vw,48px)!important;border:1px solid #e0e6e2;border-radius:18px;background:#fff;box-shadow:0 12px 38px rgba(31,58,45,.055)}
+.legal-page>article h1{font-size:clamp(30px,5vw,48px)!important;letter-spacing:-.035em}
+.legal-page>article section{padding:18px 0!important;border-top:1px solid #edf1ef}
+.legal-page .commerce-footer{margin-top:44px}
+.error-page{background:radial-gradient(circle at 50% 28%,#eef5f1,#f8f9f7 55%,#fff)!important}
+.error-page>span{display:inline-grid;place-items:center;min-width:76px;height:42px;padding:0 14px;border-radius:999px;background:#e5efe9;color:#315d4a!important;font-size:15px!important;font-weight:850}
+.error-page h1{letter-spacing:-.035em}
+.error-page a{border-radius:9px!important}
+@media(max-width:900px){.checkout-page>section{grid-template-columns:1fr!important}.checkout-summary{position:static;order:-1}.checkout-secure-header{grid-template-columns:1fr auto}.checkout-security{justify-self:end}.checkout-security small,.checkout-back{display:none}}
+@media(max-width:600px){.checkout-secure-header{min-height:62px;padding:8px 12px!important}.checkout-content>form,.checkout-content>div{padding:18px 14px}.checkout-summary{padding:15px!important}.checkout-progress{margin:14px auto 18px!important}.legal-page>article{margin:18px 12px 0!important;padding:26px 18px!important}.auth-commerce-benefits{margin-top:20px}}
