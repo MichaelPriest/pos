@@ -22,8 +22,20 @@ export function productionChecks(env, vaultProviders = [], settings = {}) {
   };
   const cardReady=settings.card_enabled!==false&&((settings.stripe_enabled&&services.stripe)||(settings.mercadopago_enabled&&services.mercadopago));
   const pixReady=settings.pix_enabled!==false&&((settings.mercadopago_enabled&&services.mercadopago)||(settings.pagbank_enabled&&services.pagbank));
+  const originConfigured=['shipping_origin_name','shipping_origin_email','shipping_origin_phone','shipping_origin_zip_code','shipping_origin_street','shipping_origin_number','shipping_origin_neighborhood','shipping_origin_city','shipping_origin_state'].every(key=>String(settings[key]||'').trim().length>0);
+  const packageConfigured=['shipping_package_width','shipping_package_height','shipping_package_length','shipping_package_weight'].every(key=>Number(settings[key])>0);
+  const documentModeConfigured=['declaration','invoice'].includes(settings.shipping_document_mode);
+  const melhorEnvioConfigured=vault.has('melhorenvio');
+  const logistics={
+    melhorenvio_configured:melhorEnvioConfigured,
+    environment:settings.melhorenvio_sandbox===false?'production':'sandbox',
+    origin_configured:originConfigured,
+    package_configured:packageConfigured,
+    document_mode_configured:documentModeConfigured,
+    customer_live_quotes_ready:melhorEnvioConfigured&&settings.melhorenvio_sandbox===false&&originConfigured&&packageConfigured&&documentModeConfigured,
+  };
   return {
-    services,
+    services,logistics,
     checks:[
       {name:'site_url',ok:validProductionOrigin(env.SITE_URL)},
       {name:'service_role',ok:Boolean(env.SUPABASE_SERVICE_ROLE_KEY)},
@@ -44,7 +56,7 @@ export default async function handler(req,res){
   if(!base||!anon)return res.status(503).json({status:'unavailable',checks:[],message:'Supabase não configurado'});
   const publicHeaders={apikey:anon,Authorization:`Bearer ${anon}`};
   const serviceHeaders={apikey:service,Authorization:`Bearer ${service}`,'Content-Type':'application/json'};
-  const settingsUrl=`${base}/rest/v1/store_settings?id=eq.1&select=id,standard_shipping_cost,express_shipping_cost,maintenance_mode,stripe_enabled,mercadopago_enabled,pagbank_enabled,pix_enabled,card_enabled`;
+  const settingsUrl=`${base}/rest/v1/store_settings?id=eq.1&select=id,standard_shipping_cost,express_shipping_cost,maintenance_mode,stripe_enabled,mercadopago_enabled,pagbank_enabled,pix_enabled,card_enabled,shipping_origin_name,shipping_origin_email,shipping_origin_phone,shipping_origin_zip_code,shipping_origin_street,shipping_origin_number,shipping_origin_neighborhood,shipping_origin_city,shipping_origin_state,shipping_package_width,shipping_package_height,shipping_package_length,shipping_package_weight,shipping_document_mode,melhorenvio_sandbox`;
   let settings={},settingsCheck;
   try{const started=Date.now(),response=await fetch(settingsUrl,{headers:publicHeaders,signal:AbortSignal.timeout(4000)}),rows=response.ok?await response.json():[];settings=rows[0]||{};settingsCheck={name:'database_schema',ok:response.ok&&Boolean(settings.id),status:response.status,latency_ms:Date.now()-started}}catch(error){settingsCheck={name:'database_schema',ok:false,status:0,error:error.name==='TimeoutError'?'timeout':'unavailable'}}
   const infrastructure=await Promise.all([
@@ -58,5 +70,5 @@ export default async function handler(req,res){
   }
   const readiness=productionChecks(process.env,vaultProviders,settings),checks=[...infrastructure,...readiness.checks],status=healthStatus(checks);
   res.setHeader('Cache-Control','no-store');
-  return res.status(status==='healthy'?200:503).json({status,checks,services:readiness.services,checked_at:new Date().toISOString()});
+  return res.status(status==='healthy'?200:503).json({status,checks,services:readiness.services,logistics:readiness.logistics,checked_at:new Date().toISOString()});
 }
