@@ -67,3 +67,15 @@ test('compra própria gera custo financeiro apenas na aprovação',async()=>{
   assert.ok(page.includes("selectedEntry?.source_type==='consignment'"));
   assert.ok(page.includes("selectedEntry?.source_type==='purchase'"));
 });
+
+test('entrada de peças suporta até cinco fotos e mantém dados repetitivos do lote',()=>{
+  assert.ok(page.includes('multiple disabled={itemForm.images.length>=5}'));
+  assert.ok(page.includes("Math.max(0,5-itemForm.images.length)"));
+  assert.ok(page.includes("images:[...current.images,...urls].slice(0,5)"));
+  assert.ok(page.includes('removeImage(index)'));
+  assert.ok(page.includes('intake-photo-grid'));
+  assert.ok(page.includes('Adicionar e cadastrar próxima'));
+  assert.ok(page.includes('category:current.category'));
+  assert.ok(page.includes('brand:current.brand'));
+  assert.ok(page.includes('condition_grade:current.condition_grade'));
+});
