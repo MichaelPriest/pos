@@ -62,3 +62,11 @@ test('schema de logística registra IDs, preço, prazo, etiqueta e status',()=>{
     'shipping_quote_days','shipping_label_url','shipping_invoice_key','shipping_document_mode'
   ]) assert.ok(migration.includes(field),field);
 });
+
+test('impressão persiste estado e despacho Melhor Envio reutiliza despacho transacional',()=>{
+  assert.ok(api.includes("shipping_provider_status:'printed'"));
+  assert.ok(admin.includes('dispatchMelhorEnvio'));
+  assert.ok(admin.includes('Despachar ME'));
+  assert.ok(admin.includes('db.dispatchOrder'));
+  assert.ok(admin.includes("order.tracking_code&&order.status!=='enviado'"));
+});
