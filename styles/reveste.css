@@ -243,3 +243,15 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 }
 
 .integration-card-head em.available{background:#e4f1e9;color:#397054}.integration-card-head em.planned{background:#fff3dc;color:#8b6823}.integration-capability{margin:12px 0 0;padding:9px 10px;border-radius:8px;background:#f7f8f6;color:var(--muted);font-size:9px;line-height:1.5}.integration-card.connected .integration-capability{background:#f0f6f2}
+
+/* Intake / consignação */
+.intake-item-form{display:grid;gap:14px;margin-top:18px}
+.intake-piece-list{display:flex;min-width:240px;flex-direction:column;gap:7px}
+.intake-piece-list>span{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.intake-piece-list button{padding:6px 9px;border:1px solid #b8c8be;border-radius:8px;background:#fff;color:var(--green);font-size:10px;font-weight:800;cursor:pointer}
+.intake-piece-list button:hover{background:#edf4f0}
+.ops-table td small{display:block;margin-top:3px;color:var(--muted)}
+@media(max-width:680px){
+  .intake-item-form .form-row{grid-template-columns:1fr}
+  .intake-piece-list{min-width:210px}
+}
