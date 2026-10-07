@@ -57,3 +57,11 @@ test('favoritos notificações e circularidade permanecem integrados ao portal',
   assert.ok(donation.includes('Faça suas peças circularem'));
   assert.ok(shell.includes('db.unreadNotificationsCount()'));
 });
+
+test('logout permanece visível no mobile',async()=>{
+  const css=await readFile(new URL('../styles/reveste.css',import.meta.url),'utf8');
+  assert.ok(shell.includes('customer-portal-signout'));
+  assert.ok(shell.includes('Sair da conta'));
+  assert.ok(css.includes('.customer-portal-profile,.customer-portal-help{display:none}'));
+  assert.ok(css.includes('.customer-portal-signout{width:100%;justify-content:center'));
+});
