@@ -327,3 +327,18 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 .intake-margin-preview small{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .intake-margin-preview strong{font-size:16px;color:var(--green)}
 .intake-margin-preview span{font-size:10px;color:var(--muted)}
+
+/* Rentabilidade */
+.profitability-filters{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr)) auto;gap:12px;align-items:end}
+.profitability-kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.profitability-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:18px}
+.profit-source{display:grid;grid-template-columns:minmax(150px,1fr) repeat(3,minmax(90px,.6fr));gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #e4e9e6}
+.profit-source:last-child{border-bottom:0}
+.profit-source>div{display:flex;flex-direction:column;gap:2px}
+.profit-source small,.profit-source span,.profitability-summary{color:var(--muted);font-size:11px}
+.profit-source strong{font-size:14px;color:var(--green)}
+.profitability-summary{display:grid;gap:10px;line-height:1.55}
+.profitability-summary p{margin:0;padding:10px 0;border-bottom:1px solid #edf0ee}
+.profitability-summary p:last-child{border-bottom:0}
+@media(max-width:1050px){.profitability-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.profitability-filters .shop-primary{grid-column:1/-1}.profitability-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.profitability-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.profitability-filters,.profitability-kpis{grid-template-columns:1fr}.profit-source{grid-template-columns:1fr 1fr}.profit-source>div{grid-column:1/-1}}
