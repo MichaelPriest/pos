@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { getSession } from '../lib/supabase';
 
-const systemPaths=['/admin','/entradas','/pdv','/caixa','/financeiro','/relatorios','/equipe','/rh','/ponto','/auditoria','/perfil','/funcionario'];
+const systemPaths=['/admin','/entradas','/trocas','/pdv','/caixa','/financeiro','/relatorios','/equipe','/rh','/ponto','/auditoria','/perfil','/funcionario'];
 const hiddenPaths=['/login','/checkout','/esqueci-senha','/redefinir-senha','/comprovante','/etiqueta','/403'];
 
 const icons={
