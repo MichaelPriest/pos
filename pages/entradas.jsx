@@ -46,14 +46,15 @@ export default function Entradas(){
     setSelectedIntake(entry?.id||'');setIntakeForm(intakeInitial());setNotice('Entrada aberta para avaliação.');await load();
   }catch(error){setNotice(error.message)}finally{setSaving(false)}};
 
-  const uploadImage=async event=>{const file=event.target.files?.[0];if(!file)return;setUploading(true);setNotice('');try{
-    const url=await storage.uploadImage('products',file,'intakes',2*1024*1024,true);
-    setItemForm(current=>({...current,images:[url]}));setNotice('Foto anexada à avaliação.');
+  const uploadImages=async event=>{const files=[...(event.target.files||[])].slice(0,Math.max(0,5-itemForm.images.length));if(!files.length)return;setUploading(true);setNotice('');try{
+    const urls=[];for(const file of files)urls.push(await storage.uploadImage('products',file,'intakes',2*1024*1024,true));
+    setItemForm(current=>({...current,images:[...current.images,...urls].slice(0,5)}));setNotice(urls.length+' foto(s) anexada(s) à avaliação.');
   }catch(error){setNotice(error.message)}finally{setUploading(false);event.target.value=''}};
+  const removeImage=index=>setItemForm(current=>({...current,images:current.images.filter((_,i)=>i!==index)}));
 
   const createItem=async event=>{event.preventDefault();if(!selectedIntake){setNotice('Selecione uma entrada antes de adicionar a peça.');return}setSaving(true);setNotice('');try{
     await db.createInventoryIntakeItem({...itemForm,intake_id:selectedIntake,acquisition_cost:Number(itemForm.acquisition_cost||0),sale_price:Number(itemForm.sale_price),store_commission_percent:Number(itemForm.store_commission_percent)});
-    setItemForm(itemInitial());setNotice('Peça adicionada para avaliação.');await load();
+    setItemForm(current=>({...itemInitial(),category:current.category,brand:current.brand,size:current.size,color:current.color,condition_grade:current.condition_grade,store_commission_percent:current.store_commission_percent}));setNotice('Peça adicionada. O formulário já está pronto para a próxima peça deste lote.');await load();
   }catch(error){setNotice(error.message)}finally{setSaving(false)}};
 
   const approve=async id=>{setNotice('');try{await db.approveInventoryIntakeItem(id);setNotice('Peça aprovada e publicada no estoque.');await load()}catch(error){setNotice(error.message)}};
@@ -90,8 +91,9 @@ export default function Entradas(){
         {selectedEntry?.source_type==='consignment'&&<label>Comissão do brechó (%)<input type="number" min="0" max="100" step="0.01" value={itemForm.store_commission_percent} onChange={e=>setItemForm({...itemForm,store_commission_percent:e.target.value})}/><small>O restante do valor será calculado como repasse ao proprietário.</small></label>}
         {selectedEntry&&Number(itemForm.sale_price||0)>0&&<div className="intake-margin-preview"><small>Margem estimada do brechó</small><strong>{money(estimatedMargin)}</strong><span>{selectedEntry.source_type==='consignment'?'Comissão estimada':selectedEntry.source_type==='purchase'?'Preço menos custo de aquisição':'Doação sem custo de aquisição'}</span></div>}
         <label>Descrição<textarea rows="3" value={itemForm.description} onChange={e=>setItemForm({...itemForm,description:e.target.value})}/></label>
-        <label>Foto da peça<input type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadImage}/><small>{uploading?'Enviando...':itemForm.images.length?'Foto anexada':'JPG, PNG ou WebP até 2 MB'}</small></label>
-        <button className="shop-primary" disabled={saving||uploading}>Adicionar à avaliação</button>
+        <label>Fotos da peça<input type="file" multiple disabled={itemForm.images.length>=5} accept="image/jpeg,image/png,image/webp" onChange={uploadImages}/><small>{uploading?'Enviando...':itemForm.images.length>=5?'Limite de 5 fotos atingido':itemForm.images.length?itemForm.images.length+' de 5 fotos anexadas':'JPG, PNG ou WebP até 2 MB · máximo 5'}</small></label>
+        {itemForm.images.length>0&&<div className="intake-photo-grid">{itemForm.images.map((url,index)=><figure key={url}><img src={url} alt={'Foto '+(index+1)+' da peça'}/><button type="button" aria-label={'Remover foto '+(index+1)} onClick={()=>removeImage(index)}>×</button></figure>)}</div>}
+        <button className="shop-primary" disabled={saving||uploading}>Adicionar e cadastrar próxima</button>
       </form>
     </section>
 
