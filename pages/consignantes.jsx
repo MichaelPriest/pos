@@ -31,8 +31,8 @@ export default function Consignantes(){
   const paid=ownerSettlements.filter(item=>item.status==='paid');
 
   const metrics={
-    gross:ownerSettlements.reduce((sum,item)=>sum+Number(item.gross_amount||0),0),
-    store:ownerSettlements.reduce((sum,item)=>sum+Number(item.store_commission_amount||0),0),
+    gross:ownerSettlements.filter(item=>item.status!=='cancelled').reduce((sum,item)=>sum+Number(item.gross_amount||0),0),
+    store:ownerSettlements.filter(item=>item.status!=='cancelled').reduce((sum,item)=>sum+Number(item.store_commission_amount||0),0),
     released:released.reduce((sum,item)=>sum+Number(item.payout_amount||0),0),
     waiting:waiting.reduce((sum,item)=>sum+Number(item.payout_amount||0),0),
     paid:paid.reduce((sum,item)=>sum+Number(item.payout_amount||0),0),
@@ -91,7 +91,7 @@ export default function Consignantes(){
 
     <section className="ops-card ops-table"><div><h2>Extrato por peça</h2><span>{rows.length} lançamento(s)</span></div><div className="table-scroll"><table><thead><tr><th>Venda</th><th>Peça</th><th>Valor vendido</th><th>Comissão loja</th><th>Repasse</th><th>Liberação</th><th>Status</th></tr></thead><tbody>{rows.length?rows.map(item=>{const releasedNow=item.status==='pending'&&new Date(item.available_at).getTime()<=now;return <tr key={item.id}><td>{date(item.orders?.created_at)}<small>#{String(item.order_id).slice(0,8)}</small></td><td><b>{item.products?.name||'Peça'}</b><small>{item.products?.sku||''}</small></td><td>{money(item.gross_amount)}</td><td>{money(item.store_commission_amount)}<small>{Number(item.commission_percent)}%</small></td><td><b>{money(item.payout_amount)}</b></td><td>{date(item.available_at)}</td><td>{item.status==='paid'?'Pago':item.status==='cancelled'?'Cancelado':releasedNow?'Liberado':'Aguardando prazo'}</td></tr>}):<tr><td colSpan="7">Nenhum lançamento encontrado para este filtro.</td></tr>}</tbody></table></div></section>
 
-    <footer className="consignor-print-footer"><span>ReVeste · Extrato emitido em {new Date().toLocaleString('pt-BR')}</span><b>Total considerado: {money(rows.reduce((sum,item)=>sum+Number(item.payout_amount||0),0))}</b></footer>
+    <footer className="consignor-print-footer"><span>ReVeste · Extrato emitido em {new Date().toLocaleString('pt-BR')}</span><b>Total considerado: {money(rows.filter(item=>item.status!=='cancelled').reduce((sum,item)=>sum+Number(item.payout_amount||0),0))}</b></footer>
   </main></AuthGuard>;
 }
 
