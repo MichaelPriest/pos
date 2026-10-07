@@ -241,3 +241,5 @@ body>div#root{width:100%;min-height:100dvh}.auth-page,.store-page,.checkout-page
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+.integration-card-head em.available{background:#e4f1e9;color:#397054}.integration-card-head em.planned{background:#fff3dc;color:#8b6823}.integration-capability{margin:12px 0 0;padding:9px 10px;border-radius:8px;background:#f7f8f6;color:var(--muted);font-size:9px;line-height:1.5}.integration-card.connected .integration-capability{background:#f0f6f2}
