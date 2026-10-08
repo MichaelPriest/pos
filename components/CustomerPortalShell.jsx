@@ -12,6 +12,7 @@ const navigation=[
   {href:'/favoritos',match:'/favoritos',icon:'heart',label:'Favoritos'},
   {href:'/notificacoes',match:'/notificacoes',icon:'bell',label:'Notificações',badge:true},
   {href:'/minha-conta?secao=enderecos',match:'secao=enderecos',icon:'pin',label:'Endereços'},
+  {href:'/minha-conta?secao=trocas',match:'secao=trocas',icon:'cycle',label:'Trocas e devoluções'},
   {href:'/minha-conta?secao=circularidade',match:'secao=circularidade',icon:'cycle',label:'Circularidade'},
   {href:'/minha-conta?secao=dados',match:'secao=dados',icon:'user',label:'Meus dados'},
 ];
