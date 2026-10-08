@@ -18,13 +18,15 @@ export default function Login() {
       else {
         const profile = await auth.profile();
         const destination = profile?.role === 'customer' ? '/loja' : profile?.role === 'cashier' ? '/caixa' : '/admin';
-        router.push(router.query.next || destination);
+        const next=typeof router.query.next==='string'&&router.query.next.startsWith('/')&&!router.query.next.startsWith('//')?router.query.next:null;
+        if(next==='/admin'&&!['admin','manager'].includes(profile?.role)){router.push('/403');return;}
+        router.push(next || destination);
       }
     } catch (error) { setStatus({ loading: false, error: error.message }); }
   };
   return <><Head><title>{register ? 'Criar conta' : 'Entrar'} | ReVeste</title></Head><main className="auth-page">
     <section className="auth-art"><Link href="/loja" className="auth-brand"><StoreBrand/></Link><div><span className="auth-kicker">MODA CIRCULAR</span><h1>Peças com história.<br/>Um novo jeito de vestir.</h1><p>Compre de forma consciente e dê uma nova vida a peças únicas selecionadas à mão.</p><div className="auth-commerce-benefits"><span><b>Compra protegida</b><small>Pagamentos processados com segurança</small></span><span><b>Pedidos rastreáveis</b><small>Acompanhe tudo pela sua conta</small></span><span><b>Peças únicas</b><small>Curadoria e revisão antes da venda</small></span></div></div><small>© 2026 ReVeste · Consumo consciente, estilo autêntico.</small></section>
-    <section className="auth-form-wrap"><form className="auth-form" onSubmit={submit}><span className="auth-mobile-logo">ReVeste</span><p className="eyebrow">SUA CONTA</p><h2>{register ? 'Crie sua conta' : 'Que bom ter você de volta'}</h2><p>{register ? 'Cadastre-se para acompanhar seus pedidos.' : 'Entre para continuar suas compras.'}</p>
+    <section className="auth-form-wrap"><form className="auth-form" onSubmit={submit}><span className="auth-mobile-logo">ReVeste</span><p className="eyebrow">{router.query.next==='/admin'?'ACESSO DA EQUIPE':'SUA CONTA'}</p><h2>{register ? 'Crie sua conta' : router.query.next==='/admin'?'Entrar no painel administrativo':'Que bom ter você de volta'}</h2><p>{register ? 'Cadastre-se para acompanhar seus pedidos.' : 'Entre para continuar suas compras.'}</p>
       {register && <label>Nome completo<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Como podemos te chamar?" /></label>}
       <label>E-mail<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="voce@email.com" /></label>
       <label>Senha<input required minLength="8" type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="Mínimo de 8 caracteres" /></label>
