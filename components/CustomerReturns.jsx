@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { db } from '../lib/supabase';
 import SystemIcon from './SystemIcon';
 
@@ -9,7 +10,8 @@ const labels={
 };
 
 export default function CustomerReturns({orders=[]}){
-  const [history,setHistory]=useState([]),[orderId,setOrderId]=useState(''),[selected,setSelected]=useState({}),
+  const route=useLocation();
+  const [history,setHistory]=useState([]),[orderId,setOrderId]=useState(()=>new URLSearchParams(route.search).get('pedido')||''),[selected,setSelected]=useState({}),
         [resolution,setResolution]=useState('refund'),[reason,setReason]=useState(''),
         [saving,setSaving]=useState(false),[loading,setLoading]=useState(true),[notice,setNotice]=useState('');
   const load=async()=>{
