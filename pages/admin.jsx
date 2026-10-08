@@ -7,7 +7,7 @@ import { db, getSession, storage } from '../lib/supabase';
 import { inventoryCode } from '../lib/inventory-code';
 
 const emptyProduct = { name:'', category:'Vestidos', size:'M', price:'', stock:1, image_url:'', description:'', active:true };
-const emptySettings = { store_name:'ReVeste', tagline:'', logo_url:'', primary_color:'#315d4a', accent_color:'#b36f53', hero_title:'', hero_subtitle:'', hero_image:'', whatsapp:'', instagram:'', facebook:'', x_url:'', tiktok:'', marketplace_mercadolivre:'', marketplace_shopee:'', support_email:'', free_shipping_threshold:250, standard_shipping_cost:19.9, express_shipping_cost:34.9, pickup_enabled:true, maintenance_mode:false, seo_title:'', seo_description:'', stripe_enabled:false, mercadopago_enabled:true, pagbank_enabled:false, pix_enabled:true, card_enabled:true, cash_enabled:true };
+const emptySettings = { store_name:'ReVeste', tagline:'', logo_url:'', primary_color:'#315d4a', accent_color:'#b36f53', hero_title:'', hero_subtitle:'', hero_image:'', whatsapp:'', instagram:'', facebook:'', x_url:'', tiktok:'', marketplace_mercadolivre:'', marketplace_shopee:'', support_email:'', free_shipping_threshold:250, standard_shipping_cost:19.9, express_shipping_cost:34.9, pickup_enabled:true, maintenance_mode:false, seo_title:'', seo_description:'', stripe_enabled:false, stripe_pix_enabled:false, mercadopago_enabled:true, pagbank_enabled:false, pix_enabled:true, card_enabled:true, cash_enabled:true };
 const money = value => Number(value || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
 const statuses = ['pendente','pago','separando','enviado','concluido','cancelado'];
 const paidStatuses = ['pago','separando','enviado','concluido'];
