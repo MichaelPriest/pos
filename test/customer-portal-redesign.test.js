@@ -65,3 +65,12 @@ test('logout permanece visível no mobile',async()=>{
   assert.ok(css.includes('.customer-portal-profile,.customer-portal-help{display:none}'));
   assert.ok(css.includes('.customer-portal-signout{width:100%;justify-content:center'));
 });
+
+test('sidebar sincroniza seção com o React Router sem recarregar a página',()=>{
+  assert.ok(account.includes("useLocation, useNavigate"));
+  assert.ok(account.includes("const route=useLocation(),navigate=useNavigate()"));
+  assert.ok(account.includes("new URLSearchParams(route.search).get('secao')"));
+  assert.ok(account.includes("},[route.search]);"));
+  assert.ok(account.includes("navigate(url)"));
+  assert.doesNotMatch(account,/history\.replaceState/);
+});
