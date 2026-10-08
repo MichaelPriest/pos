@@ -182,8 +182,7 @@ exception when unique_violation then
   if new_id is null then raise; end if;
   return new_id;
 end;
-$function$
-
+$function$;
 
 revoke execute on function public.create_order(jsonb) from public,anon;
 grant execute on function public.create_order(jsonb) to authenticated,service_role;
