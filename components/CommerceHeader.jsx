@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 import Link from '../src/shims/Link';
 import StoreBrand from './StoreBrand';
 import SystemIcon from './SystemIcon';
-import { getSession } from '../lib/supabase';
+import { auth, getSession } from '../lib/supabase';
 
 export default function CommerceHeader({cartCount,onCart,compact=false}){
   const signedIn=Boolean(getSession());
+  const [teamRole,setTeamRole]=useState(null);
+  useEffect(()=>{let active=true;if(signedIn)auth.profile().then(p=>{if(active)setTeamRole(p?.role||null)}).catch(()=>{});return()=>{active=false}},[signedIn]);
+  const teamAccess=['admin','manager'].includes(teamRole)?'/admin':teamRole==='cashier'?'/pdv':teamRole&&teamRole!=='customer'?'/perfil':'/login?next=/admin';
   const [search,setSearch]=useState(''),[localCartCount,setLocalCartCount]=useState(()=>{try{return JSON.parse(localStorage.getItem('reveste_cart')||'[]').length}catch{return 0}});
   useEffect(()=>{const refresh=()=>{try{setLocalCartCount(JSON.parse(localStorage.getItem('reveste_cart')||'[]').length)}catch{setLocalCartCount(0)}};window.addEventListener('cart:updated',refresh);window.addEventListener('storage',refresh);return()=>{window.removeEventListener('cart:updated',refresh);window.removeEventListener('storage',refresh)}},[]);
   const submit=event=>{event.preventDefault();const term=search.trim();location.href=term?'/loja?busca='+encodeURIComponent(term):'/loja#catalogo'};
@@ -19,6 +22,7 @@ export default function CommerceHeader({cartCount,onCart,compact=false}){
         <Link href={signedIn?'/favoritos':'/login?next=/favoritos'} aria-label="Favoritos"><SystemIcon name="heart"/></Link>
         <Link href={signedIn?'/notificacoes':'/login?next=/notificacoes'} aria-label="Notificações"><SystemIcon name="bell"/></Link>
         <Link href={signedIn?'/minha-conta':'/login'} aria-label={signedIn?'Minha conta':'Entrar'}><SystemIcon name="user"/></Link>
+        <Link href={teamAccess} className="commerce-team-entry" aria-label={teamRole&&teamRole!=='customer'?'Abrir painel da equipe':'Entrar na área administrativa'}><SystemIcon name="settings"/><span>{teamRole&&teamRole!=='customer'?'Painel da equipe':'Acesso Admin'}</span></Link>
         {onCart?<button className="commerce-bag" onClick={onCart} aria-label={'Abrir sacola com '+count+' item(ns)'}><SystemIcon name="bag"/><span>Sacola</span>{count>0&&<b>{count}</b>}</button>:<Link href="/loja" className="commerce-bag"><SystemIcon name="bag"/><span>Sacola</span>{count>0&&<b>{count}</b>}</Link>}
       </div>
     </header></>;
