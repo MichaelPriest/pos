@@ -41,7 +41,7 @@ export default function Account(){
         setNotice('Verificando o pagamento diretamente com a operadora...');
         try{
           const result=await db.verifyPayment(orderId,sessionId);
-          if(result.paid){localStorage.removeItem('reveste_checkout');sessionStorage.removeItem('reveste_checkout_key');setNotice('Pagamento confirmado. Seu pedido já está em processamento.')}
+          if(result.paid){localStorage.removeItem('reveste_checkout');localStorage.removeItem('reveste_cart');window.dispatchEvent(new CustomEvent('cart:updated'));sessionStorage.removeItem('reveste_checkout_key');setNotice('Pagamento confirmado. Seu pedido já está em processamento.')}
           else setNotice('Pagamento ainda não confirmado. O pedido continua aguardando aprovação.');
         }catch(error){setNotice(error.message)}
       }
