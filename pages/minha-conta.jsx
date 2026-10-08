@@ -5,11 +5,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AuthGuard from '../components/AuthGuard';
 import CustomerPortalShell from '../components/CustomerPortalShell';
 import SystemIcon from '../components/SystemIcon';
+import CustomerReturns from '../components/CustomerReturns';
 import { auth, db, storage } from '../lib/supabase';
 import { findAddress, maskCep, maskDocument, maskPhone } from '../lib/brasil';
 
 const money=value=>Number(value||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const sectionMap={resumo:'Resumo',pedidos:'Pedidos',enderecos:'Endereços',circularidade:'Circularidade',dados:'Meus dados'};
+const sectionMap={resumo:'Resumo',pedidos:'Pedidos',enderecos:'Endereços',trocas:'Trocas e devoluções',circularidade:'Circularidade',dados:'Meus dados'};
 const statusMeta={
   pendente:['Aguardando pagamento','pending'],
   pago:['Pagamento aprovado','paid'],
@@ -105,6 +106,7 @@ export default function Account(){
             <aside className="customer-quick-panel"><small>ATALHOS</small><h2>O que você quer fazer?</h2>
               <button onClick={()=>changeSection('enderecos')}><SystemIcon name="pin"/><span><b>Gerenciar endereços</b><small>Deixe o próximo checkout mais rápido</small></span><i>›</i></button>
               <Link href="/favoritos"><SystemIcon name="heart"/><span><b>Ver favoritos</b><small>Volte às peças que você salvou</small></span><i>›</i></Link>
+              <button onClick={()=>changeSection('trocas')}><SystemIcon name="cycle"/><span><b>Trocas e devoluções</b><small>Solicite e acompanhe seu pós-venda</small></span><i>›</i></button>
               <Link href="/notificacoes"><SystemIcon name="bell"/><span><b>Ver notificações</b><small>Pagamentos, envio e entrega</small></span><i>›</i></Link>
               <button onClick={()=>changeSection('circularidade')}><SystemIcon name="cycle"/><span><b>Fazer circular</b><small>Doe peças e acompanhe avaliações</small></span><i>›</i></button>
             </aside>
@@ -115,6 +117,8 @@ export default function Account(){
           <div className="customer-section-head"><div><small>HISTÓRICO DE COMPRAS</small><h2>Meus pedidos</h2><p>Acompanhe pagamento, preparação, envio e entrega.</p></div><Link href="/loja">Continuar comprando</Link></div>
           {orders.length?<div className="customer-orders-list">{orders.map(order=><OrderCard order={order} key={order.id} onResume={resumeOrder}/>)}</div>:<Empty icon="bag" title="Nenhum pedido ainda" text="Quando você comprar sua primeira peça, o acompanhamento aparecerá aqui." action="Explorar a loja" href="/loja"/>}
         </section>}
+
+        {section==='trocas'&&<CustomerReturns orders={orders}/>}
 
         {section==='enderecos'&&<section className="customer-section">
           <div className="customer-section-head"><div><small>ENTREGA</small><h2>Endereços salvos</h2><p>Gerencie os locais usados nas suas compras.</p></div><button className="customer-primary-action" onClick={()=>setAddressOpen(open=>!open)}>{addressOpen?'Cancelar':'+ Novo endereço'}</button></div>
