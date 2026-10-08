@@ -97,3 +97,27 @@ test('vitrine usa somente o checkout canônico de entrega e pagamento',()=>{
   assert.doesNotMatch(store,/const checkout=async/);
   assert.doesNotMatch(store,/className="payment-options"/);
 });
+
+test('comprar agora envia a mesma sacola para o checkout canônico',async()=>{
+  const product=await readFile(new URL('../pages/produto.jsx',import.meta.url),'utf8');
+  assert.ok(product.includes("localStorage.setItem('reveste_checkout',JSON.stringify(checkoutBag))"));
+  assert.ok(product.includes("location.href='/checkout'"));
+});
+
+test('sacola principal é limpa quando a compra entra no fluxo confirmado',async()=>{
+  const account=await readFile(new URL('../pages/minha-conta.jsx',import.meta.url),'utf8');
+  assert.ok(account.includes("localStorage.removeItem('reveste_cart')"));
+  assert.ok(checkout.includes("localStorage.removeItem('reveste_cart')"));
+  assert.ok(account.includes("cart:updated"));
+});
+
+test('admin reconhece credenciais de pagamento vindas da Vercel ou do cofre',async()=>{
+  const api=await readFile(new URL('../api/admin/payment-settings.js',import.meta.url),'utf8');
+  const hub=await readFile(new URL('../components/IntegrationHub.jsx',import.meta.url),'utf8');
+  assert.ok(api.includes('STRIPE_SECRET_KEY'));
+  assert.ok(api.includes('MERCADOPAGO_ACCESS_TOKEN'));
+  assert.ok(api.includes('PAGBANK_TOKEN'));
+  assert.ok(api.includes('environment_configured'));
+  assert.ok(hub.includes("state.source==='environment'"));
+  assert.ok(hub.includes('Remover do cofre'));
+});
