@@ -27,7 +27,7 @@ export default function ProductDetail() {
       localStorage.setItem('reveste_cart',JSON.stringify([...bag,product]));
       window.dispatchEvent(new CustomEvent('cart:updated'));
     }
-    if(goCheckout){sessionStorage.setItem('reveste_checkout_key',crypto.randomUUID());location.href='/checkout';return}
+    if(goCheckout){const checkoutBag=bag.some(item=>item.id===product.id)?bag:[...bag,product];localStorage.setItem('reveste_checkout',JSON.stringify(checkoutBag));sessionStorage.setItem('reveste_checkout_key',crypto.randomUUID());location.href='/checkout';return}
     setMessage(bag.some(item=>item.id===product.id)?'Esta peça já está na sua sacola.':'Peça adicionada à sacola.');
   };
   const toggleFavorite = async () => {
