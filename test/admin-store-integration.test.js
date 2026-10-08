@@ -69,3 +69,31 @@ test('frete ao vivo usa cotação validada no servidor e mantém fallback',()=>{
   assert.match(shipping,/shipping_quotes/i);
   assert.match(shipping,/consumed_at is null/i);
 });
+
+test('doações feitas pelo cliente são as mesmas gerenciadas pelo admin',()=>{
+  assert.ok(db.includes("donations: async ()"));
+  assert.ok(db.includes("createDonation:"));
+  assert.ok(db.includes("updateDonation:"));
+  assert.ok(admin.includes('db.donations()'));
+});
+
+test('mudanças de pedido e rastreio chegam ao cliente por notificações',async()=>{
+  const notifications=await readFile(new URL('../supabase/migrations/019_customer_notifications.sql',import.meta.url),'utf8');
+  assert.match(notifications,/notify_order_status_change/i);
+  assert.match(notifications,/notify_new_tracking_event/i);
+  assert.ok(db.includes('customer_notifications'));
+  assert.ok(db.includes('mark_my_notifications_read'));
+});
+
+test('checkout sempre revalida preço estoque e disponibilidade no catálogo vivo',()=>{
+  assert.ok(checkout.includes("stored.map(item=>db.product(item.id).catch(()=>null))"));
+  assert.ok(checkout.includes('freshProducts.filter(Boolean)'));
+  assert.ok(checkout.includes('Sua sacola foi atualizada com preço e disponibilidade atuais da loja.'));
+});
+
+test('vitrine usa somente o checkout canônico de entrega e pagamento',()=>{
+  assert.ok(store.includes("location.href='/checkout'"));
+  assert.ok(store.includes('Entrega e pagamento na próxima etapa'));
+  assert.doesNotMatch(store,/const checkout=async/);
+  assert.doesNotMatch(store,/className="payment-options"/);
+});
