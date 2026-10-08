@@ -27,7 +27,22 @@ export default async function handler(req,res){
     if(req.method==='GET'){
       const response=await fetch(`${base}/rest/v1/integration_secrets?select=provider,encrypted_value,updated_at`,{headers}),rows=await response.json();
       if(!response.ok)throw Object.assign(new Error(rows.message||'Não foi possível consultar o cofre'),{statusCode:502});
-      return res.json(Object.fromEntries(providers.map(provider=>{const row=rows.find(item=>item.provider===provider);return[provider,{configured:Boolean(row),masked:row?'••••••••••••':'',updated_at:row?.updated_at}]})));
+      const envConfigured={
+        stripe:Boolean(process.env.STRIPE_SECRET_KEY),
+        mercadopago:Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN),
+        pagbank:Boolean(process.env.PAGBANK_TOKEN),
+      };
+      return res.json(Object.fromEntries(providers.map(provider=>{
+        const row=rows.find(item=>item.provider===provider),fromEnv=Boolean(envConfigured[provider]);
+        return[provider,{
+          configured:Boolean(row)||fromEnv,
+          vault_configured:Boolean(row),
+          environment_configured:fromEnv,
+          source:row?'vault':fromEnv?'environment':null,
+          masked:row?'••••••••••••':fromEnv?'•••••••• (Vercel)':'',
+          updated_at:row?.updated_at
+        }];
+      })));
     }
     const provider=providerFrom(req);
     if(!providers.includes(provider))return res.status(400).json({message:'Provedor inválido'});
