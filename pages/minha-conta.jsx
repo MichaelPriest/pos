@@ -1,6 +1,7 @@
 import Head from '../src/shims/Head';
 import Link from '../src/shims/Link';
 import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AuthGuard from '../components/AuthGuard';
 import CustomerPortalShell from '../components/CustomerPortalShell';
 import SystemIcon from '../components/SystemIcon';
@@ -20,7 +21,8 @@ const statusMeta={
 const emptyAddress={label:'Casa',zip_code:'',street:'',number:'',complement:'',neighborhood:'',city:'',state:'',is_default:false};
 
 export default function Account(){
-  const initialSection=new URLSearchParams(location.search).get('secao')||'resumo';
+  const route=useLocation(),navigate=useNavigate();
+  const initialSection=new URLSearchParams(route.search).get('secao')||'resumo';
   const [profile,setProfile]=useState(null),[orders,setOrders]=useState([]),[donations,setDonations]=useState([]),[addresses,setAddresses]=useState([]);
   const [section,setSection]=useState(sectionMap[initialSection]?initialSection:'resumo'),[form,setForm]=useState({name:'',phone:'',document:''}),[addressForm,setAddressForm]=useState(emptyAddress);
   const [notice,setNotice]=useState(''),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[addressOpen,setAddressOpen]=useState(false),[avatarLoading,setAvatarLoading]=useState(false);
@@ -33,7 +35,7 @@ export default function Account(){
   };
 
   useEffect(()=>{
-    const params=new URLSearchParams(location.search),orderId=params.get('pedido'),sessionId=params.get('session_id');
+    const params=new URLSearchParams(route.search),orderId=params.get('pedido'),sessionId=params.get('session_id');
     const initialize=async()=>{
       if(params.get('pagamento')==='verificar'&&orderId){
         setNotice('Verificando o pagamento diretamente com a operadora...');
@@ -48,10 +50,15 @@ export default function Account(){
     initialize();
   },[]);
 
+  useEffect(()=>{
+    const requested=new URLSearchParams(route.search).get('secao')||'resumo';
+    const next=sectionMap[requested]?requested:'resumo';
+    setSection(current=>current===next?current:next);
+  },[route.search]);
+
   const changeSection=next=>{
-    setSection(next);
     const url=next==='resumo'?'/minha-conta':`/minha-conta?secao=${next}`;
-    history.replaceState({},'',url);
+    navigate(url);
     window.scrollTo({top:0,behavior:'smooth'});
   };
 
